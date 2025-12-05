@@ -17,13 +17,13 @@
     <div id="onboarding-overlay">
         <div class="onboarding-content">
             <h1>Etnik AR</h1>
-            <p>Pengenalan Alat Musik Tradisional</p>
+            <p>Mode Debugging Visual</p>
             
             <div class="instructions">
-                <strong>Cara Penggunaan:</strong><br>
-                1. Izinkan akses kamera.<br>
-                2. Arahkan kamera ke marker Angklung.<br>
-                3. Dengarkan suaranya!
+                <strong>Cek Tampilan:</strong><br>
+                1. Scan Marker.<br>
+                2. Apakah KOTAK MERAH muncul?<br>
+                3. Apakah Angklung muncul di sebelahnya?
             </div>
 
             <a href="assets/marker-angklung.png" target="_blank" class="link-marker" download>Belum punya marker? Download disini</a>
@@ -36,7 +36,7 @@
     <header>
         <div class="glass-panel">
             <h1>Etnik AR</h1>
-            <p>Scan marker untuk mulai</p>
+            <p>Cari Kotak Merah & Angklung</p>
         </div>
     </header>
 
@@ -46,7 +46,7 @@
             embedded 
             arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono; maxDetectionRate: 60; canvasWidth: 240; canvasHeight: 180;"
             vr-mode-ui="enabled: false"
-            renderer="logarithmicDepthBuffer: true; antialias: true;">
+            renderer="logarithmicDepthBuffer: true; antialias: true; colorManagement: true;">
 
             <a-assets>
                 <a-asset-item id="angklung-model" src="assets/angklung.glb"></a-asset-item>
@@ -55,12 +55,27 @@
             </a-assets>
 
             <a-marker type="pattern" url="markers/pattern-angklung.patt" id="marker-angklung" marker-handler>
+                
+                <!-- 1. LAMPU (PENTING! Biar model tidak hitam) -->
+                <a-light type="ambient" color="#ffffff" intensity="1"></a-light>
+                <a-light type="directional" color="#ffffff" intensity="1.5" position="1 1 0"></a-light>
+
+                <!-- 2. KOTAK MERAH (Debug Anchor) -->
+                <!-- Ini berfungsi sebagai patokan ukuran & posisi -->
+                <a-box 
+                    position="-0.8 0.5 0" 
+                    color="red" 
+                    scale="0.5 0.5 0.5"
+                    animation="property: rotation; to: 0 360 0; loop: true; dur: 3000">
+                </a-box>
+
+                <!-- 3. MODEL ANGKLUNG -->
+                <!-- Saya ubah posisi Y jadi 0, dan scale dibesarkan sedikit -->
                 <a-entity 
                     gltf-model="#angklung-model"
-                    scale="5 5 5" 
+                    scale="1 1 1" 
                     rotation="-90 0 0" 
-                    position="0 0 0">
-                    animation="property: rotation; to: -90 360 0; loop: true; dur: 10000; easing: linear">
+                    position="0.5 0 0">
                 </a-entity>
 
                 <a-text value="Angklung" position="0 1.5 0" mixin="text-style"></a-text>
@@ -92,5 +107,4 @@
         </div>
     </footer>
 </body>
-
 </html>

@@ -1,11 +1,14 @@
+/* --- RESET DASAR --- */
 body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    /* Mencegah highlight biru standar saat tap di Android/iOS */
+    -webkit-tap-highlight-color: transparent; 
 }
 
-/* Onboarding Screen */
+/* --- ONBOARDING SCREEN --- */
 #onboarding-overlay {
     position: fixed;
     top: 0;
@@ -20,115 +23,134 @@ body {
     text-align: center;
     padding: 20px;
     box-sizing: border-box;
-    transition: opacity 0.5s ease-out, visibility 0.5s;
+    transition: opacity 0.4s ease-out, visibility 0.4s;
 }
 
 .onboarding-content {
     background: white;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    max-width: 400px;
-    width: 100%;
+    padding: 25px;
+    border-radius: 24px; /* Lebih bulat modern */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    max-width: 90%; /* Agar tidak terlalu lebar di tablet */
+    width: 380px;
     animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @keyframes popUp {
-    from { transform: scale(0.8); opacity: 0; }
+    from { transform: scale(0.9); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
 
 .onboarding-content h1 {
-    color: #333;
-    font-size: 1.5rem;
-    margin-bottom: 5px;
-    margin-top: 0;
+    color: #2d3436;
+    font-size: 1.8rem; /* Diperbesar */
+    margin: 0 0 10px 0;
+    font-weight: 800;
 }
 
 .onboarding-content p {
-    color: #666;
+    color: #636e72;
     margin-bottom: 20px;
+    font-size: 1rem;
 }
 
 .instructions {
     text-align: left;
-    background: #f1f2f6;
-    padding: 15px;
-    border-radius: 10px;
+    background: #f8f9fa;
+    padding: 15px 20px;
+    border-radius: 12px;
     margin: 20px 0;
-    font-size: 0.9rem;
-    color: #555;
+    font-size: 0.95rem;
+    color: #2d3436;
     line-height: 1.6;
+    border: 1px solid #e9ecef;
 }
 
+/* --- PERBAIKAN LINK DOWNLOAD (JADI TOMBOL OUTLINE) --- */
 .link-marker {
     display: block;
     margin-bottom: 20px;
+    padding: 12px;
     color: #6c5ce7;
-    text-decoration: underline;
-    font-size: 0.9rem;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 2px dashed #a29bfe; /* Garis putus-putus biar beda */
+    border-radius: 12px;
+    background: #fdfdfd;
     cursor: pointer;
+    /* Menghapus efek klik yang aneh */
+    transform: none !important; 
+    transition: background 0.2s;
 }
 
+.link-marker:active {
+    background-color: #f1f0ff;
+    border-color: #6c5ce7;
+}
+
+/* Tombol Mulai (Utama) */
 #btn-start {
     background: #6c5ce7;
     color: white;
     border: none;
-    padding: 15px 30px;
-    font-size: 1rem;
+    padding: 16px 32px; /* Area tap lebih besar */
+    font-size: 1.1rem; /* Teks lebih besar */
     font-weight: bold;
     border-radius: 50px;
     cursor: pointer;
     width: 100%;
-    transition: transform 0.2s, background 0.2s;
     box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+    /* Animasi halus saat ditekan */
+    transition: transform 0.1s ease, background 0.2s; 
+    touch-action: manipulation; /* Optimasi touch */
 }
 
 #btn-start:active {
-    transform: scale(0.95);
+    transform: scale(0.98); /* Efek tekan sedikit saja biar tidak bug visual */
     background: #5649c0;
 }
 
-/* Header */
+/* --- HEADER UI --- */
 header {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     z-index: 10;
-    padding: 1rem;
+    padding: 20px; /* Padding lebih lega */
     pointer-events: none;
     box-sizing: border-box;
 }
 
 .glass-panel {
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-radius: 12px;
-    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.8); /* Lebih solid sedikit biar teks jelas */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 12px 24px;
     display: inline-block;
-    border: 1px solid rgba(255,255,255,0.3);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.5);
 }
 
 header h1 {
     margin: 0;
-    font-size: 1.2rem;
-    color: #fff;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    font-size: 1.4rem; /* Diperbesar */
+    color: #2d3436;
+    font-weight: 800;
 }
 
 header p {
-    margin: 0;
-    font-size: 0.8rem;
-    color: #f1f1f1;
+    margin: 5px 0 0 0;
+    font-size: 0.9rem;
+    color: #636e72;
 }
 
-/* Footer / Info Panel */
+/* --- FOOTER / INFO CARD --- */
 footer {
     position: absolute;
-    bottom: 20px;
+    bottom: 30px; /* Naik sedikit dari bawah layar */
     left: 0;
     width: 100%;
     z-index: 10;
@@ -139,71 +161,81 @@ footer {
 
 .info-card {
     background: white;
-    width: 85%;
-    max-width: 400px;
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 -5px 25px rgba(0,0,0,0.15);
+    width: 90%; /* Hampir full width di HP */
+    max-width: 450px;
+    border-radius: 24px;
+    padding: 25px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     pointer-events: auto;
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .hidden {
-    transform: translateY(150%);
+    transform: translateY(120%);
 }
 
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .card-header h3 {
     margin: 0;
     color: #2d3436;
-    font-size: 1.3rem;
+    font-size: 1.6rem; /* Judul alat musik besar */
 }
 
 .badge {
-    background: #ff7675;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.7rem;
+    background: #ffeaa7;
+    color: #d35400;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    font-weight: bold;
+    font-weight: 800;
+    letter-spacing: 0.5px;
 }
 
 .card-content p {
     color: #636e72;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin: 10px 0 20px 0;
+    font-size: 1rem; /* Teks deskripsi nyaman dibaca */
+    line-height: 1.6;
+    margin: 0 0 25px 0;
 }
 
 .controls {
     display: flex;
-    gap: 10px;
+    gap: 12px; /* Jarak antar tombol */
 }
 
 .btn-primary, .btn-secondary {
-    padding: 12px;
+    padding: 14px; /* Tombol tebal */
     border: none;
-    border-radius: 10px;
+    border-radius: 14px;
     cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem;
+    font-weight: 700;
+    font-size: 1rem;
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     text-decoration: none;
+    /* Mencegah seleksi teks saat ditekan */
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .btn-primary {
     background-color: #6c5ce7;
     color: white;
+    box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+}
+
+.btn-primary:active {
+    background-color: #5649c0;
+    transform: scale(0.98);
 }
 
 .btn-secondary {
@@ -211,10 +243,22 @@ footer {
     color: #2d3436;
 }
 
-/* AR.js Loader */
+.btn-secondary:active {
+    background-color: #dfe6e9;
+}
+
+/* Loader */
 .arjs-loader {
     height: 100%; width: 100%; position: absolute; top: 0; left: 0;
     background-color: rgba(0, 0, 0, 0.8); z-index: 9998;
     display: flex; justify-content: center; align-items: center;
-    color: white; font-family: sans-serif; pointer-events: none;
+    color: white; font-family: sans-serif; font-weight: bold; font-size: 1.2rem;
+    pointer-events: none;
+}
+
+/* --- MOBILE SPECIFIC TWEAKS (Layar Kecil) --- */
+@media (max-width: 380px) {
+    .onboarding-content h1 { font-size: 1.5rem; }
+    .card-header h3 { font-size: 1.4rem; }
+    .btn-primary, .btn-secondary { font-size: 0.9rem; padding: 12px; }
 }

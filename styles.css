@@ -1,29 +1,114 @@
-/* Reset Dasar */
 body {
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Wajib: Mencegah scroll saat kamera aktif */
+    overflow: hidden;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* --- HEADER STYLING --- */
+/* Onboarding Screen */
+#onboarding-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+    transition: opacity 0.5s ease-out, visibility 0.5s;
+}
+
+.onboarding-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    max-width: 400px;
+    width: 100%;
+    animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popUp {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.onboarding-content h1 {
+    color: #333;
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+    margin-top: 0;
+}
+
+.onboarding-content p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.instructions {
+    text-align: left;
+    background: #f1f2f6;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.6;
+}
+
+.link-marker {
+    display: block;
+    margin-bottom: 20px;
+    color: #6c5ce7;
+    text-decoration: underline;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+#btn-start {
+    background: #6c5ce7;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    width: 100%;
+    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+}
+
+#btn-start:active {
+    transform: scale(0.95);
+    background: #5649c0;
+}
+
+/* Header */
 header {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 10; /* Pastikan di atas layer kamera (<video>) */
+    z-index: 10;
     padding: 1rem;
-    pointer-events: none; /* Supaya klik tembus ke scene AR kalau tidak kena teks */
+    pointer-events: none;
+    box-sizing: border-box;
 }
 
 .glass-panel {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 12px;
     padding: 10px 20px;
     display: inline-block;
+    border: 1px solid rgba(255,255,255,0.3);
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
@@ -31,28 +116,16 @@ header h1 {
     margin: 0;
     font-size: 1.2rem;
     color: #fff;
-    text-transform: uppercase;
-    letter-spacing: 2px;
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 header p {
     margin: 0;
     font-size: 0.8rem;
-    color: #eee;
+    color: #f1f1f1;
 }
 
-/* --- MAIN / SCENE STYLING --- */
-main {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-}
-
-/* --- FOOTER / INFO PANEL STYLING --- */
+/* Footer / Info Panel */
 footer {
     position: absolute;
     bottom: 20px;
@@ -61,45 +134,71 @@ footer {
     z-index: 10;
     display: flex;
     justify-content: center;
-    pointer-events: none; /* Area kosong tidak menghalangi sentuhan */
+    pointer-events: none;
 }
 
 .info-card {
     background: white;
-    width: 90%;
+    width: 85%;
     max-width: 400px;
-    border-radius: 15px;
+    border-radius: 20px;
     padding: 20px;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
-    pointer-events: auto; /* Aktifkan klik hanya pada kartu */
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    box-shadow: 0 -5px 25px rgba(0,0,0,0.15);
+    pointer-events: auto;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Animasi Show/Hide */
 .hidden {
     transform: translateY(150%);
-    opacity: 0;
-    pointer-events: none;
 }
 
-.card-content h3 {
-    margin-top: 0;
-    color: #333;
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.card-header h3 {
+    margin: 0;
+    color: #2d3436;
+    font-size: 1.3rem;
+}
+
+.badge {
+    background: #ff7675;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.card-content p {
+    color: #636e72;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 10px 0 20px 0;
 }
 
 .controls {
     display: flex;
     gap: 10px;
-    margin-top: 15px;
 }
 
 .btn-primary, .btn-secondary {
-    padding: 10px 15px;
+    padding: 12px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 0.9rem;
     flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
 }
 
 .btn-primary {
@@ -108,24 +207,14 @@ footer {
 }
 
 .btn-secondary {
-    background-color: #dfe6e9;
-    color: #333;
-    text-decoration: none;
-    text-align: center;
+    background-color: #f1f2f6;
+    color: #2d3436;
 }
 
-/* --- LOADER --- */
+/* AR.js Loader */
 .arjs-loader {
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.8);
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    pointer-events: none;
+    height: 100%; width: 100%; position: absolute; top: 0; left: 0;
+    background-color: rgba(0, 0, 0, 0.8); z-index: 9998;
+    display: flex; justify-content: center; align-items: center;
+    color: white; font-family: sans-serif; pointer-events: none;
 }

@@ -1,58 +1,83 @@
-// Menunggu sampai Scene AR siap
 window.onload = () => {
-    // Menghilangkan Loader
-    const scene = document.querySelector('a-scene');
+    const onboarding = document.getElementById('onboarding-overlay');
+    const btnStart = document.getElementById('btn-start');
+    const bgMusic = document.getElementById('sound-angklung');
     const loader = document.querySelector('.arjs-loader');
-    
+    const scene = document.querySelector('a-scene');
+
     scene.addEventListener('loaded', () => {
         loader.style.display = 'none';
-        console.log("AR Scene Loaded");
+    });
+
+    // Onboarding & Audio Unlock
+    btnStart.addEventListener('click', () => {
+        onboarding.style.opacity = '0';
+        onboarding.style.visibility = 'hidden';
+
+        // Trik memancing browser agar audio diizinkan
+        if(bgMusic) {
+            bgMusic.volume = 0;
+            bgMusic.play().then(() => {
+                bgMusic.pause();
+                bgMusic.currentTime = 0;
+                bgMusic.volume = 1;
+                console.log("Audio Context Unlocked!");
+            }).catch(error => {
+                console.warn("Audio autoplay policy handled:", error);
+            });
+        }
     });
 };
 
-// Mendaftarkan Component Custom 'marker-handler' ke A-Frame
-// Ini adalah cara A-Frame berkomunikasi dengan UI HTML
 AFRAME.registerComponent('marker-handler', {
     init: function () {
         const marker = this.el;
         const infoPanel = document.getElementById('info-panel');
         const btnAudio = document.getElementById('btn-audio');
-
-        // Status Audio (Simulasi)
+        const audioEl = document.getElementById('sound-angklung');
+        
         let isPlaying = false;
 
-        // Event saat Marker Ditemukan (Found)
         marker.addEventListener('markerFound', () => {
-            console.log("Marker ditemukan!");
-            
-            // Tampilkan Panel Info di Footer
+            console.log("Marker Found");
             infoPanel.classList.remove('hidden');
         });
 
-        // Event saat Marker Hilang (Lost)
         marker.addEventListener('markerLost', () => {
-            console.log("Marker hilang!");
-            
-            // Sembunyikan Panel Info
+            console.log("Marker Lost");
             infoPanel.classList.add('hidden');
             
-            // Reset Audio button text (Opsional)
-            btnAudio.innerText = "🔊 Mainkan Suara";
-            isPlaying = false;
-        });
-
-        // Logika Tombol Audio
-        btnAudio.addEventListener('click', function() {
-            if(!isPlaying) {
-                // Di sini nanti kode: audio.play();
-                btnAudio.innerText = "⏸️ Stop Suara";
-                alert("Suara Angklung dimainkan! (Placeholder)");
-                isPlaying = true;
-            } else {
-                // Di sini nanti kode: audio.pause();
+            if (isPlaying && audioEl) {
+                audioEl.pause();
+                audioEl.currentTime = 0;
                 btnAudio.innerText = "🔊 Mainkan Suara";
                 isPlaying = false;
             }
         });
+
+        if(btnAudio && audioEl) {
+            btnAudio.addEventListener('click', function(e) {
+                e.stopPropagation();
+
+                if(!isPlaying) {
+                    audioEl.play().then(() => {
+                        btnAudio.innerText = "⏸️ Stop Suara";
+                        isPlaying = true;
+                    }).catch(err => {
+                        console.error("Error play:", err);
+                        alert("Gagal memutar audio. Cek path file audio.");
+                    });
+                } else {
+                    audioEl.pause();
+                    btnAudio.innerText = "🔊 Mainkan Suara";
+                    isPlaying = false;
+                }
+            });
+
+            audioEl.addEventListener('ended', function() {
+                btnAudio.innerText = "🔊 Mainkan Suara";
+                isPlaying = false;
+            });
+        }
     }
 });

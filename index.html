@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>Web AR Alat Musik Tradisional</title>
+    
+    <!-- A-Frame Library -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <!-- AR.js Library (Versi Standar untuk kompatibilitas Marker & Image) -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    
+    <!-- Custom Styles & Script -->
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+    <!-- UI: HEADER (Overlay di atas kamera) -->
+    <header>
+        <div class="glass-panel">
+            <h1>Etnik AR</h1>
+            <p>Scan marker untuk mulai</p>
+        </div>
+    </header>
+
+    <!-- CONTENT: AR SCENE -->
+    <main>
+        <!-- Scene A-Frame -->
+        <!-- vr-mode-ui="enabled: false" menghilangkan tombol kacamata VR di pojok kanan -->
+        <a-scene 
+            embedded 
+            arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+            vr-mode-ui="enabled: false"
+            renderer="logarithmicDepthBuffer: true; antialias: true;">
+
+            <!-- ASSET MANAGER: Tempat load 3D Model & Audio -->
+            <a-assets>
+                <!-- Placeholder warna jika model belum ada -->
+                <a-mixin id="text-style" text="align: center; width: 3; color: white;"></a-mixin>
+            </a-assets>
+
+            <!-- MARKER SYSTEM -->
+            <!-- Kita gunakan komponen 'marker-handler' yang kita buat di script.js -->
+            <a-marker preset="hiro" id="marker-angklung" marker-handler>
+                
+                <!-- 1. OBJEK 3D (Sementara Kotak Merah Berputar) -->
+                <!-- Nanti diganti: <a-gltf-model src="assets/angklung.glb" ...></a-gltf-model> -->
+                <a-box 
+                    position="0 0.5 0" 
+                    color="tomato" 
+                    depth="1" height="1" width="1"
+                    animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear">
+                </a-box>
+
+                <!-- 2. Label AR -->
+                <a-text value="Angklung" position="0 1.5 0" mixin="text-style"></a-text>
+                <a-text value="Jawa Barat" position="0 1.3 0" width="2" color="yellow" align="center"></a-text>
+
+            </a-marker>
+
+            <!-- KAMERA -->
+            <a-entity camera></a-entity>
+        </a-scene>
+    </main>
+
+    <!-- UI: FOOTER (Overlay Informasi saat marker terdeteksi) -->
+    <footer>
+        <!-- Panel Info ini tersembunyi (hidden) secara default, muncul via Javascript -->
+        <div id="info-panel" class="info-card hidden">
+            <div class="card-content">
+                <h3>Angklung</h3>
+                <p>Alat musik multitonal (bernada ganda) yang berkembang dari masyarakat Sunda.</p>
+                <div class="controls">
+                    <button id="btn-audio" class="btn-primary">🔊 Mainkan Suara</button>
+                    <a href="https://id.wikipedia.org/wiki/Angklung" target="_blank" class="btn-secondary">Baca Selengkapnya</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading Screen -->
+        <div class="arjs-loader">
+            <div>Memuat AR Experience...</div>
+        </div>
+    </footer>
+
+</body>
+</html>

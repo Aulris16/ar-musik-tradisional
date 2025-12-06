@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Etnik AR - Alat Musik Tradisional Indonesia</title>
     
-    <!-- Favicon (opsional) -->
+    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
     
     <!-- AR Libraries -->
@@ -40,14 +40,15 @@
                 </div>
             </div>
 
+            <!-- ✅ FIXED: Proper structure -->
             <div id="loading-status">
                 <div class="loader"></div>
-                <span>Memuat pengalaman AR...</span>
+                <span class="status-text">Memuat pengalaman AR...</span>
             </div>
 
             <button id="btn-start" disabled>
                 <span class="btn-icon">📷</span>
-                <span>Mulai Pengalaman AR</span>
+                <span class="btn-text">Mulai Pengalaman AR</span>
             </button>
             
             <a href="assets/marker-angklung.png" target="_blank" class="download-marker" download>
@@ -88,15 +89,11 @@
             <audio id="sound-angklung" src="assets/angklung.mp3" preload="auto"></audio>
         </a-assets>
 
-        <!-- ============================================ -->
         <!-- MARKER ANGKLUNG -->
-        <!-- ============================================ -->
         <a-marker type="pattern" url="markers/pattern-angklung.patt" id="marker-angklung">
-            <!-- Lighting -->
             <a-light type="ambient" color="#ffffff" intensity="1"></a-light>
             <a-light type="directional" color="#ffffff" intensity="0.6" position="0 2 1"></a-light>
             
-            <!-- Model 3D Angklung -->
             <a-entity 
                 id="model-angklung"
                 gltf-model="#angklung-model"
@@ -106,13 +103,11 @@
                 animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear;">
             </a-entity>
 
-            <!-- Text Labels -->
             <a-text value="ANGKLUNG" 
                     position="0 1.2 0" 
                     align="center" 
                     color="#ffffff" 
-                    scale="1.2 1.2 1.2"
-                    font="mozillavr">
+                    scale="1.2 1.2 1.2">
             </a-text>
             <a-text value="Jawa Barat" 
                     position="0 0.95 0" 
@@ -122,12 +117,11 @@
             </a-text>
         </a-marker>
 
-        <!-- CAMERA -->
         <a-entity camera></a-entity>
     </a-scene>
 
     <!-- ============================================ -->
-    <!-- INFO PANEL (Footer) -->
+    <!-- INFO PANEL -->
     <!-- ============================================ -->
     <div id="info-panel" class="info-panel hidden">
         <div class="info-header">
@@ -149,13 +143,13 @@
             </button>
             <a href="https://id.wikipedia.org/wiki/Angklung" target="_blank" rel="noopener" class="btn-action btn-wiki">
                 <span class="action-icon">📖</span>
-                <span>Baca Selengkapnya</span>
+                <span>Selengkapnya</span>
             </a>
         </div>
     </div>
 
     <!-- ============================================ -->
-    <!-- SCAN HINT (Muncul saat tidak ada marker) -->
+    <!-- SCAN HINT -->
     <!-- ============================================ -->
     <div id="scan-hint" class="scan-hint">
         <div class="scan-animation">

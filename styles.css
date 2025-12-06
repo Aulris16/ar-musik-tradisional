@@ -1,75 +1,231 @@
 /* ============================================
-   TAMBAHAN: MULTI-MARKER DOWNLOADS
+   CSS VARIABLES
    ============================================ */
-.marker-downloads {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 2px dashed var(--gray-200);
+:root {
+    --primary: #6c5ce7;
+    --primary-dark: #5849c4;
+    --secondary: #00cec9;
+    --accent: #ffd700;
+    --success: #00b894;
+    --white: #ffffff;
+    --gray-100: #f8f9fa;
+    --gray-200: #e9ecef;
+    --gray-600: #6c757d;
+    --gray-800: #343a40;
+    --shadow: 0 10px 40px rgba(0,0,0,0.15);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.25);
+    --radius: 20px;
+    --radius-sm: 12px;
 }
 
-.marker-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--gray-600);
-    margin-bottom: 12px;
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.marker-buttons {
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    background: #000;
+}
+
+/* ============================================
+   ONBOARDING SCREEN
+   ============================================ */
+#onboarding-overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 10000;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+#onboarding-overlay.hide {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none;
+    transition: opacity 0.5s ease, visibility 0.5s;
+}
+
+.onboarding-content {
+    background: var(--white);
+    padding: 40px 28px;
+    border-radius: 28px;
+    box-shadow: var(--shadow-lg);
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+}
+
+.app-icon {
+    font-size: 4rem;
+    margin-bottom: 8px;
+    line-height: 1;
+    height: 70px;
     display: flex;
-    gap: 10px;
-}
-
-.download-marker-btn {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 16px 12px;
-    background: var(--gray-100);
-    border: 2px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    text-decoration: none;
-    color: var(--gray-800);
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.2s;
+    animation: bounce 2s infinite;
 }
 
-.download-marker-btn:active {
-    background: var(--gray-200);
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.onboarding-content h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--gray-800);
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+
+.subtitle {
+    font-size: 1.15rem;
+    color: var(--gray-600);
+    margin-bottom: 28px;
+    min-height: 1.5em;
+}
+
+/* ============================================
+   INSTRUCTIONS
+   ============================================ */
+.instructions {
+    background: var(--gray-100);
+    padding: 20px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 24px;
+    text-align: left;
+    min-height: 180px;
+}
+
+.instruction-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    font-size: 1.1rem;
+    color: var(--gray-800);
+    min-height: 56px;
+}
+
+.instruction-item:not(:last-child) {
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.step {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    background: var(--primary);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   LOADING STATUS
+   ============================================ */
+#loading-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px;
+    background: #fff3cd;
+    border-radius: var(--radius-sm);
+    margin-bottom: 20px;
+    font-size: 1.05rem;
+    color: #856404;
+    min-height: 56px;
+    height: 56px;
+}
+
+#loading-status.ready {
+    background: #d4edda;
+    color: #155724;
+}
+
+#loading-status .loader {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border: 3px solid #856404;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+#loading-status.ready .loader {
+    display: none;
+}
+
+#loading-status .status-text {
+    flex: 1;
+    text-align: center;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+#btn-start {
+    width: 100%;
+    padding: 18px 24px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--white);
+    background: var(--gray-600);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    transition: background 0.3s ease, transform 0.1s ease;
+    min-height: 60px;
+    height: 60px;
+}
+
+#btn-start:not(:disabled) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+#btn-start:not(:disabled):active {
     transform: scale(0.98);
 }
 
-.download-marker-btn span:first-child {
-    font-size: 2rem;
-}
-
-/* ============================================
-   INFO BADGE COLORS (per instrument)
-   ============================================ */
-.info-badge.angklung {
-    background: linear-gradient(135deg, #a8e6cf 0%, #88d8b0 100%);
-    color: #1e7145;
-}
-
-.info-badge.gendang-bulo {
-    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-    color: #d35400;
-}
-
-/* ============================================
-   SCAN HINT - Updated text
-   ============================================ */
-.scan-hint p {
-    color: var(--white);
-    font-size: 1.1rem;
-    font-weight: 600;
-    text-align: center;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-    background: rgba(0,0,0,0.6);
-    padding: 12px 20px;
-    border-radius: 30px;
-    max-width: 280px;
+.btn-icon {
+    font-size: 1.4rem;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

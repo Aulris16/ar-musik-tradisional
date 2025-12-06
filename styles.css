@@ -1,265 +1,265 @@
-/* --- RESET DASAR --- */
-body {
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* {
     margin: 0;
     padding: 0;
-    overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    /* Mencegah highlight biru standar saat tap di Android/iOS */
-    -webkit-tap-highlight-color: transparent; 
+    box-sizing: border-box;
 }
 
-/* --- ONBOARDING SCREEN --- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================
+   DEBUG OVERLAY
+   ============================================ */
+#debug-overlay {
+    position: fixed;
+    top: 80px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.9);
+    color: #00ff00;
+    padding: 12px;
+    border-radius: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    z-index: 99999;
+    max-width: 200px;
+    max-height: 280px;
+    overflow-y: auto;
+    border: 1px solid #00ff00;
+}
+
+#debug-overlay hr {
+    border-color: #333;
+    margin: 5px 0;
+}
+
+/* ============================================
+   ONBOARDING
+   ============================================ */
 #onboarding-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-    z-index: 9999;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 10000;
     display: flex;
     justify-content: center;
     align-items: center;
-    text-align: center;
     padding: 20px;
-    box-sizing: border-box;
-    transition: opacity 0.4s ease-out, visibility 0.4s;
+    transition: opacity 0.5s ease, visibility 0.5s;
+}
+
+#onboarding-overlay.hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .onboarding-content {
     background: white;
-    padding: 25px;
-    border-radius: 24px; /* Lebih bulat modern */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-    max-width: 90%; /* Agar tidak terlalu lebar di tablet */
-    width: 380px;
-    animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes popUp {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+    padding: 30px 25px;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
 }
 
 .onboarding-content h1 {
-    color: #2d3436;
-    font-size: 2.5rem; /* Diperbesar */
-    margin: 0 0 10px 0;
-    font-weight: 800;
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 5px;
 }
 
-.onboarding-content p {
-    color: #636e72;
+.onboarding-content > p {
+    color: #666;
     margin-bottom: 20px;
-    font-size: 1.5rem;
+    font-size: 1rem;
 }
 
+/* Status Box */
+.status-loading {
+    background: #fff3cd;
+    color: #856404;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.status-ready {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Instructions */
 .instructions {
-    text-align: left;
     background: #f8f9fa;
-    padding: 15px 20px;
-    border-radius: 12px;
-    margin: 20px 0;
-    font-size: 1.5rem;
-    color: #2d3436;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: left;
+    font-size: 0.9rem;
+    color: #333;
     line-height: 1.6;
+    margin-bottom: 20px;
     border: 1px solid #e9ecef;
 }
 
-/* --- PERBAIKAN LINK DOWNLOAD (JADI TOMBOL OUTLINE) --- */
-.link-marker {
-    display: block;
-    margin-bottom: 20px;
-    padding: 12px;
-    color: #6c5ce7;
-    text-decoration: none;
-    font-size: 0.95rem;
-    font-weight: 600;
-    border: 2px dashed #a29bfe; /* Garis putus-putus biar beda */
-    border-radius: 12px;
-    background: #fdfdfd;
-    cursor: pointer;
-    /* Menghapus efek klik yang aneh */
-    transform: none !important; 
-    transition: background 0.2s;
-}
-
-.link-marker:active {
-    background-color: #f1f0ff;
-    border-color: #6c5ce7;
-}
-
-/* Tombol Mulai (Utama) */
+/* Buttons */
 #btn-start {
-    background: #6c5ce7;
-    color: white;
-    border: none;
-    padding: 16px 32px; /* Area tap lebih besar */
-    font-size: 1.5rem; /* Teks lebih besar */
-    font-weight: bold;
-    border-radius: 50px;
-    cursor: pointer;
     width: 100%;
-    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
-    /* Animasi halus saat ditekan */
-    transition: transform 0.1s ease, background 0.2s; 
-    touch-action: manipulation; /* Optimasi touch */
+    padding: 16px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+    background: #6c757d;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: all 0.2s;
 }
 
-#btn-start:active {
-    transform: scale(0.98); /* Efek tekan sedikit saja biar tidak bug visual */
-    background: #5649c0;
+#btn-start:not(:disabled) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-/* --- HEADER UI --- */
+#btn-start:not(:disabled):active {
+    transform: scale(0.98);
+}
+
+.btn-hiro {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    background: #28a745;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.btn-hiro:active {
+    background: #218838;
+    transform: scale(0.98);
+}
+
+/* Marker Links */
+.marker-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.link-btn {
+    display: block;
+    padding: 12px;
+    background: #f8f9fa;
+    color: #495057;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: 2px dashed #dee2e6;
+    transition: all 0.2s;
+}
+
+.link-btn:active {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
 header {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 10;
-    padding: 20px; /* Padding lebih lega */
+    padding: 15px;
+    z-index: 100;
     pointer-events: none;
-    box-sizing: border-box;
 }
 
 .glass-panel {
-    background: rgba(255, 255, 255, 0.8); /* Lebih solid sedikit biar teks jelas */
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 16px;
-    padding: 12px 24px;
     display: inline-block;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    border: 1px solid rgba(255,255,255,0.5);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 12px 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-header h1 {
-    margin: 0;
-    font-size: 1.5rem; /* Diperbesar */
-    color: #2d3436;
-    font-weight: 800;
+.glass-panel h1 {
+    font-size: 1.3rem;
+    color: #333;
+    margin-bottom: 2px;
 }
 
-header p {
-    margin: 5px 0 0 0;
-    font-size: 1rem;
-    color: #636e72;
+.glass-panel p {
+    font-size: 0.85rem;
+    color: #666;
 }
 
-/* --- FOOTER / INFO CARD --- */
+/* ============================================
+   FOOTER / INFO CARD
+   ============================================ */
 footer {
-    position: absolute;
-    bottom: 30px; /* Naik sedikit dari bawah layar */
+    position: fixed;
+    bottom: 20px;
     left: 0;
     width: 100%;
-    z-index: 10;
     display: flex;
     justify-content: center;
+    z-index: 100;
+    padding: 0 15px;
     pointer-events: none;
 }
 
 .info-card {
     background: white;
-    width: 90%; /* Hampir full width di HP */
-    max-width: 450px;
-    border-radius: 24px;
-    padding: 25px;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 20px;
+    padding: 20px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     pointer-events: auto;
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.4s ease, opacity 0.4s ease;
 }
 
-.hidden {
-    transform: translateY(120%);
+.info-card.hidden {
+    transform: translateY(150%);
+    opacity: 0;
 }
 
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .card-header h3 {
-    margin: 0;
-    color: #2d3436;
-    font-size: 2.6rem; /* Judul alat musik besar */
+    font-size: 1.5rem;
+    color: #333;
 }
 
 .badge {
-    background: #ffeaa7;
-    color: #d35400;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 1.75rem;
-    text-transform: uppercase;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-}
-
-.card-content p {
-    color: #636e72;
-    font-size: 1.5rem; /* Teks deskripsi nyaman dibaca */
-    line-height: 1.6;
-    margin: 0 0 25px 0;
-}
-
-.controls {
-    display: flex;
-    gap: 12px; /* Jarak antar tombol */
-}
-
-.btn-primary, .btn-secondary {
-    padding: 14px; /* Tombol tebal */
-    border: none;
-    border-radius: 14px;
-    cursor: pointer;
-    font-weight: 700;
-    font-size: 1rem;
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-decoration: none;
-    /* Mencegah seleksi teks saat ditekan */
-    user-select: none;
-    -webkit-user-select: none;
-}
-
-.btn-primary {
-    background-color: #6c5ce7;
-    color: white;
-    box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
-}
-
-.btn-primary:active {
-    background-color: #5649c0;
-    transform: scale(0.98);
-}
-
-.btn-secondary {
-    background-color: #f1f2f6;
-    color: #2d3436;
-}
-
-.btn-secondary:active {
-    background-color: #dfe6e9;
-}
-
-/* Loader */
-.arjs-loader {
-    height: 100%; width: 100%; position: absolute; top: 0; left: 0;
-    background-color: rgba(0, 0, 0, 0.8); z-index: 9998;
-    display: flex; justify-content: center; align-items: center;
-    color: white; font-family: sans-serif; font-weight: bold; font-size: 1.2rem;
-    pointer-events: none;
-}
-
-/* --- MOBILE SPECIFIC TWEAKS (Layar Kecil) --- */
-@media (max-width: 380px) {
-    .onboarding-content h1 { font-size: 2.5rem; }
-    .card-header h3 { font-size: 2.4rem; }
-    .btn-primary, .btn-secondary { font-size: 0.9rem; padding: 12px; }
-}
-
+    background: #fff3cd;
+    color: 

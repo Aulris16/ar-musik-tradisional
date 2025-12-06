@@ -1,5 +1,5 @@
 // ============================================
-// ETNIK AR - Production Script (Fixed)
+// ETNIK AR - Multi-Marker Support
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,16 +13,63 @@ document.addEventListener('DOMContentLoaded', () => {
     const headerStatus = document.getElementById('status-text');
     const scene = document.querySelector('a-scene');
     
+    // Info Panel Elements
     const infoPanel = document.getElementById('info-panel');
     const btnClose = document.getElementById('btn-close');
     const btnAudio = document.getElementById('btn-audio');
-    const audioEl = document.getElementById('sound-angklung');
+    const btnWiki = document.getElementById('btn-wiki');
+    const infoName = document.getElementById('info-name');
+    const infoBadge = document.getElementById('info-badge');
+    const infoDescription = document.getElementById('info-description');
     
     const scanHint = document.getElementById('scan-hint');
-    const markerAngklung = document.getElementById('marker-angklung');
+    
+    // All markers
+    const markers = document.querySelectorAll('a-marker');
     
     let isAudioPlaying = false;
+    let currentAudioEl = null;
+    let currentMarkerData = null;
     let arReady = false;
+
+    // ============================================
+    // INSTRUMENT DATA (from marker attributes)
+    // ============================================
+    function getMarkerData(marker) {
+        return {
+            id: marker.id,
+            name: marker.dataset.name || 'Unknown',
+            origin: marker.dataset.origin || 'Indonesia',
+            description: marker.dataset.description || 'Deskripsi tidak tersedia.',
+            audioId: marker.dataset.audio || null,
+            wikiUrl: marker.dataset.wiki || '#'
+        };
+    }
+
+    // ============================================
+    // UPDATE INFO PANEL
+    // ============================================
+    function updateInfoPanel(data) {
+        if (infoName) infoName.textContent = data.name;
+        if (infoBadge) {
+            infoBadge.textContent = data.origin;
+            // Remove old classes and add new one
+            infoBadge.className = 'info-badge';
+            const badgeClass = data.id.replace('marker-', '');
+            infoBadge.classList.add(badgeClass);
+        }
+        if (infoDescription) infoDescription.textContent = data.description;
+        if (btnWiki) btnWiki.href = data.wikiUrl;
+        
+        // Set current audio element
+        if (data.audioId) {
+            currentAudioEl = document.getElementById(data.audioId);
+        } else {
+            currentAudioEl = null;
+        }
+        
+        currentMarkerData = data;
+    }
 
     // ============================================
     // WAIT FOR AR.JS TO LOAD
@@ -47,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function onARReady() {
         arReady = true;
         
-        // ✅ FIX: Update text content only, don't change structure
         if (statusTextEl) {
             statusTextEl.textContent = '✅ Siap digunakan!';
         }
@@ -55,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingStatus.classList.add('ready');
         }
         
-        // Enable button
         if (btnStart) {
             btnStart.disabled = false;
             const btnText = btnStart.querySelector('.btn-text');
@@ -84,35 +129,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============================================
-    // MARKER EVENTS
+    // MARKER EVENTS (All Markers)
     // ============================================
-    if (markerAngklung) {
-        markerAngklung.addEventListener('markerFound', () => {
-            console.log('Marker found!');
+    markers.forEach(marker => {
+        // Marker Found
+        marker.addEventListener('markerFound', () => {
+            const data = getMarkerData(marker);
+            console.log(`Marker found: ${data.name}`);
             
-            if (headerStatus) headerStatus.textContent = '🎯 Angklung Terdeteksi!';
+            // Update UI
+            if (headerStatus) headerStatus.textContent = `🎯 ${data.name} Terdeteksi!`;
             if (scanHint) scanHint.classList.add('hidden');
+            
+            // Update and show info panel
+            updateInfoPanel(data);
             if (infoPanel) infoPanel.classList.remove('hidden');
         });
         
-        markerAngklung.addEventListener('markerLost', () => {
-            console.log('Marker lost');
+        // Marker Lost
+        marker.addEventListener('markerLost', () => {
+            const data = getMarkerData(marker);
+            console.log(`Marker lost: ${data.name}`);
             
+            // Update UI
             if (headerStatus) headerStatus.textContent = 'Arahkan kamera ke marker';
             if (scanHint) scanHint.classList.remove('hidden');
             if (infoPanel) infoPanel.classList.add('hidden');
             
+            // Stop audio
             stopAudio();
         });
-    }
+    });
 
     // ============================================
     // AUDIO CONTROLS
     // ============================================
     function stopAudio() {
-        if (audioEl && isAudioPlaying) {
-            audioEl.pause();
-            audioEl.currentTime = 0;
+        if (currentAudioEl && isAudioPlaying) {
+            currentAudioEl.pause();
+            currentAudioEl.currentTime = 0;
             isAudioPlaying = false;
             updateAudioButton();
         }
@@ -135,10 +190,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    if (btnAudio && audioEl) {
+    if (btnAudio) {
         btnAudio.addEventListener('click', () => {
+            if (!currentAudioEl) {
+                alert('Audio tidak tersedia untuk alat musik ini.');
+                return;
+            }
+            
             if (!isAudioPlaying) {
-                audioEl.play()
+                // Stop any previously playing audio first
+                stopAllAudio();
+                
+                currentAudioEl.play()
                     .then(() => {
                         isAudioPlaying = true;
                         updateAudioButton();
@@ -151,12 +214,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 stopAudio();
             }
         });
-        
-        audioEl.addEventListener('ended', () => {
+    }
+    
+    // Stop all audio elements
+    function stopAllAudio() {
+        const allAudio = document.querySelectorAll('audio');
+        allAudio.forEach(audio => {
+            audio.pause();
+            audio.currentTime = 0;
+        });
+        isAudioPlaying = false;
+    }
+    
+    // Listen for audio ended on all audio elements
+    const allAudioElements = document.querySelectorAll('audio');
+    allAudioElements.forEach(audio => {
+        audio.addEventListener('ended', () => {
             isAudioPlaying = false;
             updateAudioButton();
         });
-    }
+    });
 
     // ============================================
     // BUTTON HANDLERS
@@ -174,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (infoPanel) {
                 infoPanel.classList.add('hidden');
             }
+            stopAudio();
         });
     }
 

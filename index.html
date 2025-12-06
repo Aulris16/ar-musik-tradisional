@@ -2,149 +2,137 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>Web AR Alat Musik Tradisional</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Etnik AR - Alat Musik Tradisional</title>
     
-    <!-- ✅ ERUDA: Console untuk debugging di HP -->
+    <!-- ✅ ERUDA Debug Console untuk HP -->
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>eruda.init();</script>
     
-    <!-- AR Libraries -->
-    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@v1.4.2/dist/aframe-master.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
+    <!-- ✅ CDN YANG SUDAH TERUJI & STABIL -->
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- ✅ DEBUG OVERLAY: Tampilkan status langsung di layar -->
-    <div id="debug-overlay" style="
-        position: fixed;
-        top: 70px;
-        right: 10px;
-        background: rgba(0,0,0,0.8);
-        color: #0f0;
-        padding: 10px;
-        border-radius: 8px;
-        font-family: monospace;
-        font-size: 11px;
-        z-index: 10000;
-        max-width: 200px;
-        max-height: 300px;
-        overflow-y: auto;
-    ">
+    <!-- DEBUG OVERLAY -->
+    <div id="debug-overlay">
         <div><strong>🔍 DEBUG LOG</strong></div>
+        <hr>
         <div id="debug-log"></div>
     </div>
 
-    <!-- Onboarding Overlay -->
+    <!-- ONBOARDING -->
     <div id="onboarding-overlay">
         <div class="onboarding-content">
-            <h1>Etnik AR</h1>
-            <p>Mode Debugging Visual</p>
+            <h1>🎵 Etnik AR</h1>
+            <p>Augmented Reality Alat Musik</p>
             
+            <div id="asset-status" class="status-loading">
+                ⏳ Memuat library AR...
+            </div>
+
             <div class="instructions">
-                <strong>Cek Tampilan:</strong><br>
-                1. Scan Marker.<br>
-                2. Apakah KOTAK MERAH muncul?<br>
-                3. Apakah Angklung muncul di sebelahnya?
+                <strong>📋 Cara Pakai:</strong><br>
+                1. Klik tombol START/TEST<br>
+                2. Arahkan kamera ke marker<br>
+                3. Jarak 20-40cm, tahan stabil
             </div>
 
-            <div id="asset-status" style="background: #fff3cd; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 0.9rem;">
-                ⏳ Memuat model 3D...
-            </div>
-
-            <a href="assets/marker-angklung.png" target="_blank" class="link-marker" download>Belum punya marker? Download disini</a>
-
-            <button id="btn-start" disabled>TUNGGU LOADING...</button>
+            <button id="btn-start" disabled>⏳ LOADING...</button>
             
-            <button id="btn-test-hiro" style="margin-top: 10px; background: #28a745; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-size: 1rem;">
-                🧪 TEST DENGAN MARKER HIRO
+            <button id="btn-test-hiro" class="btn-hiro">
+                🧪 TEST MARKER HIRO
             </button>
+            
+            <div class="marker-links">
+                <a href="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" target="_blank" class="link-btn">
+                    📷 Buka Marker HIRO
+                </a>
+                <a href="assets/marker-angklung.png" target="_blank" class="link-btn" download>
+                    📥 Download Marker Angklung
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Header UI -->
+    <!-- HEADER -->
     <header>
         <div class="glass-panel">
             <h1>Etnik AR</h1>
-            <p id="status-text">Mencari Marker...</p>
+            <p id="status-text">Memuat...</p>
         </div>
     </header>
 
-    <!-- AR Scene -->
-    <main>
-        <a-scene 
-            embedded 
-            arjs="sourceType: webcam; 
-                  debugUIEnabled: true; 
-                  detectionMode: mono_and_matrix; 
-                  matrixCodeType: 3x3;
-                  patternRatio: 0.75;"
-            vr-mode-ui="enabled: false"
-            renderer="logarithmicDepthBuffer: true; antialias: true; alpha: true;"
-            loading-screen="enabled: false">
+    <!-- AR SCENE -->
+    <a-scene 
+        embedded 
+        arjs="sourceType: webcam; debugUIEnabled: true; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+        vr-mode-ui="enabled: false"
+        renderer="logarithmicDepthBuffer: true; antialias: true;"
+        loading-screen="enabled: false">
 
-            <a-assets timeout="30000">
-                <a-asset-item id="angklung-model" src="assets/angklung.glb"></a-asset-item>
-                <audio id="sound-angklung" src="assets/angklung.mp3" preload="auto"></audio> 
-            </a-assets>
+        <!-- ASSETS -->
+        <a-assets timeout="30000">
+            <a-asset-item id="angklung-model" src="assets/angklung.glb"></a-asset-item>
+            <audio id="sound-angklung" src="assets/angklung.mp3" preload="auto"></audio>
+        </a-assets>
 
-            <!-- Custom Marker -->
-            <a-marker id="marker-angklung" 
-                      type="pattern" 
-                      url="markers/pattern-angklung.patt"
-                      smooth="true"
-                      smoothCount="5"
-                      smoothTolerance="0.01"
-                      smoothThreshold="2"
-                      marker-handler>
-                
-                <a-light type="ambient" color="#ffffff" intensity="1.2"></a-light>
-                <a-light type="directional" color="#ffffff" intensity="0.8" position="1 2 1"></a-light>
+        <!-- ============================================ -->
+        <!-- MARKER HIRO (UNTUK TESTING) -->
+        <!-- ============================================ -->
+        <a-marker preset="hiro" id="marker-hiro" raycaster="objects: .clickable" emitevents="true" cursor="fuse: false; rayOrigin: mouse;">
+            <!-- Lighting -->
+            <a-light type="ambient" color="#ffffff" intensity="1"></a-light>
+            <a-light type="directional" color="#ffffff" intensity="0.5" position="0 1 1"></a-light>
+            
+            <!-- Kotak Biru (Debug) -->
+            <a-box position="0 0.5 0" 
+                   material="color: #4285f4;" 
+                   scale="1 1 1"
+                   animation="property: rotation; to: 0 360 0; loop: true; dur: 2000; easing: linear;">
+            </a-box>
+            
+            <!-- Text -->
+            <a-text value="HIRO OK!" position="0 1.5 0" align="center" color="#00ff00" scale="1.5 1.5 1.5"></a-text>
+        </a-marker>
 
-                <!-- Debug Box -->
-                <a-box 
-                    position="0 0.25 0" 
-                    color="red" 
-                    scale="0.5 0.5 0.5"
-                    animation="property: rotation; to: 0 360 0; loop: true; dur: 3000">
-                </a-box>
+        <!-- ============================================ -->
+        <!-- MARKER ANGKLUNG (CUSTOM) -->
+        <!-- ============================================ -->
+        <a-marker type="pattern" url="markers/pattern-angklung.patt" id="marker-angklung">
+            <!-- Lighting -->
+            <a-light type="ambient" color="#ffffff" intensity="1"></a-light>
+            <a-light type="directional" color="#ffffff" intensity="0.5" position="0 1 1"></a-light>
+            
+            <!-- Kotak Merah (Debug) -->
+            <a-box position="0 0.5 0" 
+                   material="color: #ff0000;" 
+                   scale="0.5 0.5 0.5"
+                   animation="property: rotation; to: 0 360 0; loop: true; dur: 3000; easing: linear;">
+            </a-box>
+            
+            <!-- Model 3D Angklung -->
+            <a-entity 
+                id="model-angklung"
+                gltf-model="#angklung-model"
+                scale="0.5 0.5 0.5" 
+                rotation="0 0 0" 
+                position="0.7 0 0">
+            </a-entity>
 
-                <!-- Model Angklung -->
-                <a-entity 
-                    id="model-angklung"
-                    gltf-model="#angklung-model"
-                    scale="0.5 0.5 0.5" 
-                    rotation="0 0 0" 
-                    position="0 0 0"
-                    model-loaded>
-                </a-entity>
+            <!-- Text Labels -->
+            <a-text value="ANGKLUNG" position="0 1.3 0" align="center" color="#ffffff" scale="1 1 1"></a-text>
+            <a-text value="Jawa Barat" position="0 1.1 0" align="center" color="#ffff00" scale="0.7 0.7 0.7"></a-text>
+        </a-marker>
 
-                <a-text value="Angklung" position="0 1.2 0" align="center" width="3" color="white"></a-text>
-                <a-text value="Jawa Barat" position="0 1.0 0" width="2" color="yellow" align="center"></a-text>
-            </a-marker>
+        <!-- CAMERA -->
+        <a-entity camera></a-entity>
+    </a-scene>
 
-            <!-- HIRO Marker untuk Testing -->
-            <a-marker id="marker-hiro" preset="hiro" marker-handler-hiro>
-                <a-light type="ambient" color="#ffffff" intensity="1.2"></a-light>
-                <a-box position="0 0.5 0" color="blue" scale="0.5 0.5 0.5"
-                    animation="property: rotation; to: 0 360 0; loop: true; dur: 2000">
-                </a-box>
-                <a-entity 
-                    gltf-model="#angklung-model"
-                    scale="0.5 0.5 0.5" 
-                    rotation="0 0 0" 
-                    position="0.8 0 0">
-                </a-entity>
-                <a-text value="TEST HIRO OK!" position="0 1.2 0" align="center" width="3" color="lime"></a-text>
-            </a-marker>
-
-            <a-entity camera></a-entity>
-        </a-scene>
-    </main>
-
-    <!-- Footer Info -->
+    <!-- FOOTER INFO PANEL -->
     <footer>
         <div id="info-panel" class="info-card hidden">
             <div class="card-content">
@@ -152,20 +140,15 @@
                     <h3>Angklung</h3>
                     <span class="badge">Jawa Barat</span>
                 </div>
-                <p>Alat musik multitonal yang berkembang dari masyarakat Sunda. Terbuat dari bambu.</p>
+                <p>Alat musik multitonal dari masyarakat Sunda. Terbuat dari bambu.</p>
                 <div class="controls">
                     <button id="btn-audio" class="btn-primary">🔊 Mainkan Suara</button>
-                    <a href="https://id.wikipedia.org/wiki/Angklung" target="_blank" class="btn-secondary">Info Detail</a>
                 </div>
             </div>
         </div>
-        
-        <div class="arjs-loader">
-            <div>Memuat AR Experience...</div>
-        </div>
     </footer>
 
+    <!-- SCRIPT -->
     <script src="script.js"></script>
 </body>
 </html>
-

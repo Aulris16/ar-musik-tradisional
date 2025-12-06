@@ -67,17 +67,19 @@ body {
     max-width: 420px;
     width: 100%;
     text-align: center;
+    /* ✅ FIX: Prevent layout shift */
+    min-height: fit-content;
 }
 
 .app-icon {
     font-size: 4rem;
     margin-bottom: 8px;
-    animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    line-height: 1;
+    /* ✅ FIX: Stable height */
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .onboarding-content h1 {
@@ -85,21 +87,29 @@ body {
     font-weight: 800;
     color: var(--gray-800);
     margin-bottom: 8px;
+    /* ✅ FIX: Stable height */
+    line-height: 1.2;
 }
 
 .subtitle {
     font-size: 1.15rem;
     color: var(--gray-600);
     margin-bottom: 28px;
+    /* ✅ FIX: Stable height */
+    min-height: 1.5em;
 }
 
-/* Instructions */
+/* ============================================
+   INSTRUCTIONS - FIXED HEIGHT
+   ============================================ */
 .instructions {
     background: var(--gray-100);
     padding: 20px;
     border-radius: var(--radius-sm);
     margin-bottom: 24px;
     text-align: left;
+    /* ✅ FIX: Prevent shrinking */
+    min-height: 180px;
 }
 
 .instruction-item {
@@ -109,6 +119,8 @@ body {
     padding: 12px 0;
     font-size: 1.1rem;
     color: var(--gray-800);
+    /* ✅ FIX: Stable height per item */
+    min-height: 56px;
 }
 
 .instruction-item:not(:last-child) {
@@ -118,6 +130,7 @@ body {
 .step {
     width: 32px;
     height: 32px;
+    min-width: 32px; /* ✅ FIX: Prevent shrinking */
     background: var(--primary);
     color: var(--white);
     border-radius: 50%;
@@ -129,7 +142,9 @@ body {
     flex-shrink: 0;
 }
 
-/* Loading Status */
+/* ============================================
+   LOADING STATUS - FIXED HEIGHT
+   ============================================ */
 #loading-status {
     display: flex;
     align-items: center;
@@ -141,6 +156,9 @@ body {
     margin-bottom: 20px;
     font-size: 1.05rem;
     color: #856404;
+    /* ✅ FIX: Fixed height to prevent layout shift */
+    min-height: 56px;
+    height: 56px;
 }
 
 #loading-status.ready {
@@ -148,24 +166,34 @@ body {
     color: #155724;
 }
 
-#loading-status.ready .loader {
-    display: none;
-}
-
-.loader {
+/* ✅ FIX: Hide loader but keep space */
+#loading-status .loader {
     width: 20px;
     height: 20px;
+    min-width: 20px;
     border: 3px solid #856404;
     border-top-color: transparent;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
 
+#loading-status.ready .loader {
+    display: none;
+}
+
+/* ✅ FIX: Status text stable */
+#loading-status .status-text {
+    flex: 1;
+    text-align: center;
+}
+
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
 
-/* Buttons */
+/* ============================================
+   BUTTONS - FIXED HEIGHT
+   ============================================ */
 #btn-start {
     width: 100%;
     padding: 18px 24px;
@@ -181,7 +209,10 @@ body {
     justify-content: center;
     gap: 10px;
     margin-bottom: 14px;
-    transition: all 0.3s ease;
+    transition: background 0.3s ease, transform 0.1s ease;
+    /* ✅ FIX: Fixed height */
+    min-height: 60px;
+    height: 60px;
 }
 
 #btn-start:not(:disabled) {
@@ -195,6 +226,12 @@ body {
 
 .btn-icon {
     font-size: 1.4rem;
+    /* ✅ FIX: Stable size */
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .download-marker {
@@ -211,7 +248,9 @@ body {
     border: 2px dashed var(--primary);
     border-radius: var(--radius-sm);
     text-decoration: none;
-    transition: all 0.2s;
+    transition: background 0.2s;
+    /* ✅ FIX: Fixed height */
+    min-height: 56px;
 }
 
 .download-marker:active {
@@ -242,6 +281,8 @@ header {
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     pointer-events: auto;
+    /* ✅ FIX: Stable height */
+    min-height: 72px;
 }
 
 .header-left {
@@ -252,18 +293,25 @@ header {
 
 .header-icon {
     font-size: 2rem;
+    line-height: 1;
 }
 
 .header-text h1 {
     font-size: 1.4rem;
     font-weight: 700;
     color: var(--gray-800);
+    line-height: 1.2;
 }
 
 .header-text p {
     font-size: 1rem;
     color: var(--gray-600);
     margin-top: 2px;
+    /* ✅ FIX: Prevent text wrap causing shift */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
 }
 
 /* ============================================
@@ -443,6 +491,8 @@ header {
     cursor: pointer;
     text-decoration: none;
     transition: all 0.2s;
+    /* ✅ FIX: Stable height */
+    min-height: 56px;
 }
 
 .btn-audio {
@@ -480,6 +530,10 @@ header {
         font-size: 3rem;
     }
     
+    .header-text p {
+        max-width: 300px;
+    }
+    
     .info-panel {
         left: 50%;
         transform: translateX(-50%);
@@ -505,7 +559,15 @@ header {
         padding: 30px 20px;
     }
     
+    .instructions {
+        min-height: 160px;
+    }
+    
     .info-panel {
         padding: 24px 20px;
+    }
+    
+    .header-text p {
+        max-width: 150px;
     }
 }

@@ -1,5 +1,5 @@
 // ============================================
-// ETNIK AR - Fixed: Controlled AR Start
+// ETNIK AR - Fixed Camera Issue
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,8 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusTextEl = loadingStatus?.querySelector('.status-text');
     const headerStatus = document.getElementById('status-text');
     
-    const arHeader = document.getElementById('ar-header');
     const arContainer = document.getElementById('ar-container');
+    const arHeader = document.getElementById('ar-header');
+    const scanHint = document.getElementById('scan-hint');
     
     const infoPanel = document.getElementById('info-panel');
     const btnClose = document.getElementById('btn-close');
@@ -25,57 +26,60 @@ document.addEventListener('DOMContentLoaded', () => {
     const infoBadge = document.getElementById('info-badge');
     const infoDescription = document.getElementById('info-description');
     
-    const scanHint = document.getElementById('scan-hint');
-    
     let isAudioPlaying = false;
     let currentAudioEl = null;
-    let currentMarkerData = null;
-    let arReady = false;
     let arStarted = false;
 
     // ============================================
-    // ENSURE ONBOARDING IS VISIBLE
-    // ============================================
-    if (onboarding) {
-        onboarding.style.opacity = '1';
-        onboarding.style.visibility = 'visible';
-        onboarding.style.display = 'flex';
-        onboarding.classList.remove('hide');
-    }
-
-    // ============================================
-    // CHECK AR LIBRARIES LOADED
+    // WAIT FOR AR.JS & CAMERA
     // ============================================
     function checkARReady() {
-        let attempts = 0;
-        const maxAttempts = 40; // 12 seconds max
+        const scene = document.querySelector('a-scene');
         
-        const check = setInterval(() => {
-            attempts++;
-            
-            // Check if A-Frame is loaded
-            if (typeof AFRAME !== 'undefined') {
-                clearInterval(check);
-                console.log('A-Frame loaded');
-                onARReady();
-            } else if (attempts >= maxAttempts) {
-                clearInterval(check);
-                console.log('Timeout - enabling anyway');
+        if (!scene) {
+            console.error('No a-scene found');
+            enableButton();
+            return;
+        }
+        
+        // Check if scene is already loaded
+        if (scene.hasLoaded) {
+            console.log('Scene already loaded');
+            onARReady();
+            return;
+        }
+        
+        // Wait for scene to load
+        scene.addEventListener('loaded', () => {
+            console.log('Scene loaded');
+            onARReady();
+        });
+        
+        // Also listen for camera ready
+        scene.addEventListener('arjs-video-loaded', () => {
+            console.log('Camera video loaded');
+        });
+        
+        // Fallback timeout
+        setTimeout(() => {
+            if (!arStarted) {
+                console.log('Fallback: enabling button');
                 onARReady();
             }
-        }, 300);
+        }, 8000);
     }
     
     function onARReady() {
-        arReady = true;
-        
         if (statusTextEl) {
             statusTextEl.textContent = '✅ Siap digunakan!';
         }
         if (loadingStatus) {
             loadingStatus.classList.add('ready');
         }
-        
+        enableButton();
+    }
+    
+    function enableButton() {
         if (btnStart) {
             btnStart.disabled = false;
             const btnText = btnStart.querySelector('.btn-text');
@@ -83,40 +87,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnText.textContent = 'Mulai Pengalaman AR';
             }
         }
-        
-        console.log('AR Ready!');
     }
     
-    // Start checking after a short delay
-    setTimeout(checkARReady, 500);
+    // Start checking
+    checkARReady();
 
     // ============================================
-    // START AR EXPERIENCE
+    // START AR
     // ============================================
     function startAR() {
         if (arStarted) return;
         arStarted = true;
         
-        console.log('Starting AR...');
+        console.log('Starting AR experience...');
         
         // Hide onboarding
         if (onboarding) {
             onboarding.classList.add('hide');
         }
         
-        // Show AR elements
-        if (arHeader) {
-            arHeader.style.display = 'block';
-        }
+        // Show AR container (change from hidden to visible)
         if (arContainer) {
-            arContainer.style.display = 'block';
-        }
-        if (scanHint) {
-            scanHint.classList.remove('hidden');
+            arContainer.classList.remove('ar-hidden');
+            arContainer.classList.add('ar-visible');
         }
         
-        // Initialize marker listeners after AR starts
-        setTimeout(initMarkerListeners, 500);
+        // Show header
+        if (arHeader) {
+            arHeader.classList.remove('ar-ui-hidden');
+            arHeader.classList.add('ar-ui-visible');
+        }
+        
+        // Show scan hint
+        if (scanHint) {
+            scanHint.classList.remove('ar-ui-hidden');
+            scanHint.classList.add('ar-ui-visible');
+        }
+        
+        // Initialize marker listeners
+        initMarkerListeners();
     }
 
     // ============================================
@@ -149,11 +158,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
-        console.log(`Initialized ${markers.length} markers`);
+        console.log(`Initialized ${markers.length} marker listeners`);
     }
 
     // ============================================
-    // MARKER DATA HELPER
+    // HELPER FUNCTIONS
     // ============================================
     function getMarkerData(marker) {
         return {
@@ -166,9 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // ============================================
-    // UPDATE INFO PANEL
-    // ============================================
     function updateInfoPanel(data) {
         if (infoName) infoName.textContent = data.name;
         if (infoBadge) {
@@ -180,13 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (infoDescription) infoDescription.textContent = data.description;
         if (btnWiki) btnWiki.href = data.wikiUrl;
         
-        if (data.audioId) {
-            currentAudioEl = document.getElementById(data.audioId);
-        } else {
-            currentAudioEl = null;
-        }
-        
-        currentMarkerData = data;
+        currentAudioEl = data.audioId ? document.getElementById(data.audioId) : null;
     }
 
     // ============================================
@@ -199,16 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
             isAudioPlaying = false;
             updateAudioButton();
         }
-    }
-    
-    function stopAllAudio() {
-        const allAudio = document.querySelectorAll('audio');
-        allAudio.forEach(audio => {
-            audio.pause();
-            audio.currentTime = 0;
-        });
-        isAudioPlaying = false;
-        updateAudioButton();
     }
     
     function updateAudioButton() {
@@ -231,12 +221,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnAudio) {
         btnAudio.addEventListener('click', () => {
             if (!currentAudioEl) {
-                alert('Audio tidak tersedia untuk alat musik ini.');
+                alert('Audio tidak tersedia.');
                 return;
             }
             
             if (!isAudioPlaying) {
-                stopAllAudio();
+                // Stop all audio first
+                document.querySelectorAll('audio').forEach(a => {
+                    a.pause();
+                    a.currentTime = 0;
+                });
                 
                 currentAudioEl.play()
                     .then(() => {
@@ -253,9 +247,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Audio ended listeners
-    const allAudioElements = document.querySelectorAll('audio');
-    allAudioElements.forEach(audio => {
+    // Audio ended event
+    document.querySelectorAll('audio').forEach(audio => {
         audio.addEventListener('ended', () => {
             isAudioPlaying = false;
             updateAudioButton();
@@ -274,20 +267,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (btnClose) {
         btnClose.addEventListener('click', () => {
-            if (infoPanel) {
-                infoPanel.classList.add('hidden');
-            }
+            if (infoPanel) infoPanel.classList.add('hidden');
             stopAudio();
         });
     }
-
-    // ============================================
-    // FALLBACK: Enable button after 10 seconds
-    // ============================================
-    setTimeout(() => {
-        if (!arReady) {
-            console.log('Fallback: enabling button');
-            onARReady();
-        }
-    }, 10000);
 });

@@ -5,90 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Etnik AR - Alat Musik Tradisional Indonesia</title>
     
-    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
     
     <link rel="stylesheet" href="styles.css">
-    
-    <!-- ✅ CRITICAL: Load script BEFORE A-Frame -->
-    <script>
-        // Prevent A-Frame from auto-hiding anything
-        window.APP_STARTED = false;
-    </script>
 </head>
 <body>
 
     <!-- ============================================ -->
-    <!-- ONBOARDING SCREEN -->
-    <!-- ✅ FIXED: Inline style to guarantee visibility -->
+    <!-- AR SCENE (Di belakang, tapi sudah aktif) -->
     <!-- ============================================ -->
-    <div id="onboarding-overlay" style="opacity: 1; visibility: visible; display: flex;">
-        <div class="onboarding-content">
-            <div class="app-icon">🎵</div>
-            <h1>Etnik AR</h1>
-            <p class="subtitle">Jelajahi Alat Musik Tradisional Indonesia</p>
-            
-            <div class="instructions">
-                <div class="instruction-item">
-                    <span class="step">1</span>
-                    <span>Pilih & siapkan marker</span>
-                </div>
-                <div class="instruction-item">
-                    <span class="step">2</span>
-                    <span>Arahkan kamera ke marker</span>
-                </div>
-                <div class="instruction-item">
-                    <span class="step">3</span>
-                    <span>Nikmati pengalaman AR!</span>
-                </div>
-            </div>
-
-            <div id="loading-status">
-                <div class="loader"></div>
-                <span class="status-text">Memuat pengalaman AR...</span>
-            </div>
-
-            <button id="btn-start" disabled>
-                <span class="btn-icon">📷</span>
-                <span class="btn-text">Mulai Pengalaman AR</span>
-            </button>
-            
-            <!-- Download Markers -->
-            <div class="marker-downloads">
-                <p class="marker-title">📥 Download Marker:</p>
-                <div class="marker-buttons">
-                    <a href="assets/marker-angklung.png" target="_blank" class="download-marker-btn" download>
-                        <span>🎋</span>
-                        <span>Angklung</span>
-                    </a>
-                    <a href="assets/marker-gendang-bulo.png" target="_blank" class="download-marker-btn" download>
-                        <span>🥁</span>
-                        <span>Gendang Bulo</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================ -->
-    <!-- HEADER (Hidden until AR starts) -->
-    <!-- ============================================ -->
-    <header id="ar-header" style="display: none;">
-        <div class="header-content">
-            <div class="header-left">
-                <span class="header-icon">🎵</span>
-                <div class="header-text">
-                    <h1>Etnik AR</h1>
-                    <p id="status-text">Arahkan kamera ke marker</p>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- ============================================ -->
-    <!-- AR SCENE (Hidden until started) -->
-    <!-- ============================================ -->
-    <div id="ar-container" style="display: none;">
+    <div id="ar-container" class="ar-hidden">
         <a-scene 
             embedded 
             arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
@@ -162,6 +88,71 @@
     </div>
 
     <!-- ============================================ -->
+    <!-- ONBOARDING (Di atas, menutupi AR) -->
+    <!-- ============================================ -->
+    <div id="onboarding-overlay">
+        <div class="onboarding-content">
+            <div class="app-icon">🎵</div>
+            <h1>Etnik AR</h1>
+            <p class="subtitle">Jelajahi Alat Musik Tradisional Indonesia</p>
+            
+            <div class="instructions">
+                <div class="instruction-item">
+                    <span class="step">1</span>
+                    <span>Pilih & siapkan marker</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="step">2</span>
+                    <span>Arahkan kamera ke marker</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="step">3</span>
+                    <span>Nikmati pengalaman AR!</span>
+                </div>
+            </div>
+
+            <div id="loading-status">
+                <div class="loader"></div>
+                <span class="status-text">Memuat pengalaman AR...</span>
+            </div>
+
+            <button id="btn-start" disabled>
+                <span class="btn-icon">📷</span>
+                <span class="btn-text">Mulai Pengalaman AR</span>
+            </button>
+            
+            <div class="marker-downloads">
+                <p class="marker-title">📥 Download Marker:</p>
+                <div class="marker-buttons">
+                    <a href="assets/marker-angklung.png" target="_blank" class="download-marker-btn" download>
+                        <span>🎋</span>
+                        <span>Angklung</span>
+                    </a>
+                    <a href="assets/marker-gendang-bulo.png" target="_blank" class="download-marker-btn" download>
+                        <span>🥁</span>
+                        <span>Gendang Bulo</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- HEADER -->
+    <!-- ============================================ -->
+    <header id="ar-header" class="ar-ui-hidden">
+        <div class="header-content">
+            <div class="header-left">
+                <span class="header-icon">🎵</span>
+                <div class="header-text">
+                    <h1>Etnik AR</h1>
+                    <p id="status-text">Arahkan kamera ke marker</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================ -->
     <!-- INFO PANEL -->
     <!-- ============================================ -->
     <div id="info-panel" class="info-panel hidden">
@@ -192,18 +183,16 @@
     <!-- ============================================ -->
     <!-- SCAN HINT -->
     <!-- ============================================ -->
-    <div id="scan-hint" class="scan-hint hidden">
+    <div id="scan-hint" class="scan-hint ar-ui-hidden">
         <div class="scan-animation">
             <div class="scan-corners"></div>
         </div>
         <p>Arahkan kamera ke salah satu marker</p>
     </div>
 
-    <!-- ✅ Load AR libraries AFTER DOM structure -->
+    <!-- SCRIPTS -->
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    
-    <!-- App Script -->
     <script src="script.js"></script>
 </body>
 </html>

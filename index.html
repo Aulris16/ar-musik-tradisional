@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Etnik AR - Alat Musik Tradisional</title>
+    <title>Etnik AR - Alat Musik Tradisional Indonesia</title>
     
-    <!-- ✅ ERUDA Debug Console untuk HP -->
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>eruda.init();</script>
+    <!-- Favicon (opsional) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
     
-    <!-- ✅ CDN YANG SUDAH TERUJI & STABIL -->
+    <!-- AR Libraries -->
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     
@@ -17,59 +16,68 @@
 </head>
 <body>
 
-    <!-- DEBUG OVERLAY -->
-    <div id="debug-overlay">
-        <div><strong>🔍 DEBUG LOG</strong></div>
-        <hr>
-        <div id="debug-log"></div>
-    </div>
-
-    <!-- ONBOARDING -->
+    <!-- ============================================ -->
+    <!-- ONBOARDING SCREEN -->
+    <!-- ============================================ -->
     <div id="onboarding-overlay">
         <div class="onboarding-content">
-            <h1>🎵 Etnik AR</h1>
-            <p>Augmented Reality Alat Musik</p>
+            <div class="app-icon">🎵</div>
+            <h1>Etnik AR</h1>
+            <p class="subtitle">Jelajahi Alat Musik Tradisional Indonesia</p>
             
-            <div id="asset-status" class="status-loading">
-                ⏳ Memuat library AR...
-            </div>
-
             <div class="instructions">
-                <strong>📋 Cara Pakai:</strong><br>
-                1. Klik tombol START/TEST<br>
-                2. Arahkan kamera ke marker<br>
-                3. Jarak 20-40cm, tahan stabil
+                <div class="instruction-item">
+                    <span class="step">1</span>
+                    <span>Siapkan marker Angklung</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="step">2</span>
+                    <span>Arahkan kamera ke marker</span>
+                </div>
+                <div class="instruction-item">
+                    <span class="step">3</span>
+                    <span>Nikmati pengalaman AR!</span>
+                </div>
             </div>
 
-            <button id="btn-start" disabled>⏳ LOADING...</button>
-            
-            <button id="btn-test-hiro" class="btn-hiro">
-                🧪 TEST MARKER HIRO
+            <div id="loading-status">
+                <div class="loader"></div>
+                <span>Memuat pengalaman AR...</span>
+            </div>
+
+            <button id="btn-start" disabled>
+                <span class="btn-icon">📷</span>
+                <span>Mulai Pengalaman AR</span>
             </button>
             
-            <div class="marker-links">
-                <a href="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" target="_blank" class="link-btn">
-                    📷 Buka Marker HIRO
-                </a>
-                <a href="assets/marker-angklung.png" target="_blank" class="link-btn" download>
-                    📥 Download Marker Angklung
-                </a>
-            </div>
+            <a href="assets/marker-angklung.png" target="_blank" class="download-marker" download>
+                <span class="btn-icon">📥</span>
+                <span>Download Marker Angklung</span>
+            </a>
         </div>
     </div>
 
+    <!-- ============================================ -->
     <!-- HEADER -->
+    <!-- ============================================ -->
     <header>
-        <div class="glass-panel">
-            <h1>Etnik AR</h1>
-            <p id="status-text">Memuat...</p>
+        <div class="header-content">
+            <div class="header-left">
+                <span class="header-icon">🎵</span>
+                <div class="header-text">
+                    <h1>Etnik AR</h1>
+                    <p id="status-text">Arahkan kamera ke marker</p>
+                </div>
+            </div>
         </div>
     </header>
 
+    <!-- ============================================ -->
     <!-- AR SCENE -->
+    <!-- ============================================ -->
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; debugUIEnabled: true; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
         vr-mode-ui="enabled: false"
         renderer="logarithmicDepthBuffer: true; antialias: true;"
         loading-screen="enabled: false">
@@ -81,38 +89,12 @@
         </a-assets>
 
         <!-- ============================================ -->
-        <!-- MARKER HIRO (UNTUK TESTING) -->
-        <!-- ============================================ -->
-        <a-marker preset="hiro" id="marker-hiro" raycaster="objects: .clickable" emitevents="true" cursor="fuse: false; rayOrigin: mouse;">
-            <!-- Lighting -->
-            <a-light type="ambient" color="#ffffff" intensity="1"></a-light>
-            <a-light type="directional" color="#ffffff" intensity="0.5" position="0 1 1"></a-light>
-            
-            <!-- Kotak Biru (Debug) -->
-            <a-box position="0 0.5 0" 
-                   material="color: #4285f4;" 
-                   scale="1 1 1"
-                   animation="property: rotation; to: 0 360 0; loop: true; dur: 2000; easing: linear;">
-            </a-box>
-            
-            <!-- Text -->
-            <a-text value="HIRO OK!" position="0 1.5 0" align="center" color="#00ff00" scale="1.5 1.5 1.5"></a-text>
-        </a-marker>
-
-        <!-- ============================================ -->
-        <!-- MARKER ANGKLUNG (CUSTOM) -->
+        <!-- MARKER ANGKLUNG -->
         <!-- ============================================ -->
         <a-marker type="pattern" url="markers/pattern-angklung.patt" id="marker-angklung">
             <!-- Lighting -->
             <a-light type="ambient" color="#ffffff" intensity="1"></a-light>
-            <a-light type="directional" color="#ffffff" intensity="0.5" position="0 1 1"></a-light>
-            
-            <!-- Kotak Merah (Debug) -->
-            <a-box position="0 0.5 0" 
-                   material="color: #ff0000;" 
-                   scale="0.5 0.5 0.5"
-                   animation="property: rotation; to: 0 360 0; loop: true; dur: 3000; easing: linear;">
-            </a-box>
+            <a-light type="directional" color="#ffffff" intensity="0.6" position="0 2 1"></a-light>
             
             <!-- Model 3D Angklung -->
             <a-entity 
@@ -120,35 +102,68 @@
                 gltf-model="#angklung-model"
                 scale="0.5 0.5 0.5" 
                 rotation="0 0 0" 
-                position="0.7 0 0">
+                position="0 0 0"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear;">
             </a-entity>
 
             <!-- Text Labels -->
-            <a-text value="ANGKLUNG" position="0 1.3 0" align="center" color="#ffffff" scale="1 1 1"></a-text>
-            <a-text value="Jawa Barat" position="0 1.1 0" align="center" color="#ffff00" scale="0.7 0.7 0.7"></a-text>
+            <a-text value="ANGKLUNG" 
+                    position="0 1.2 0" 
+                    align="center" 
+                    color="#ffffff" 
+                    scale="1.2 1.2 1.2"
+                    font="mozillavr">
+            </a-text>
+            <a-text value="Jawa Barat" 
+                    position="0 0.95 0" 
+                    align="center" 
+                    color="#ffd700" 
+                    scale="0.8 0.8 0.8">
+            </a-text>
         </a-marker>
 
         <!-- CAMERA -->
         <a-entity camera></a-entity>
     </a-scene>
 
-    <!-- FOOTER INFO PANEL -->
-    <footer>
-        <div id="info-panel" class="info-card hidden">
-            <div class="card-content">
-                <div class="card-header">
-                    <h3>Angklung</h3>
-                    <span class="badge">Jawa Barat</span>
-                </div>
-                <p>Alat musik multitonal dari masyarakat Sunda. Terbuat dari bambu.</p>
-                <div class="controls">
-                    <button id="btn-audio" class="btn-primary">🔊 Mainkan Suara</button>
-                </div>
+    <!-- ============================================ -->
+    <!-- INFO PANEL (Footer) -->
+    <!-- ============================================ -->
+    <div id="info-panel" class="info-panel hidden">
+        <div class="info-header">
+            <div class="info-title">
+                <h2>Angklung</h2>
+                <span class="info-badge">Jawa Barat</span>
             </div>
+            <button id="btn-close" class="btn-close" aria-label="Tutup">×</button>
         </div>
-    </footer>
+        
+        <div class="info-body">
+            <p>Angklung adalah alat musik multitonal yang berkembang dari masyarakat Sunda. Terbuat dari bambu dan dimainkan dengan cara digoyangkan. UNESCO mengakui Angklung sebagai Warisan Budaya Dunia pada tahun 2010.</p>
+        </div>
+        
+        <div class="info-actions">
+            <button id="btn-audio" class="btn-action btn-audio">
+                <span class="action-icon">🔊</span>
+                <span>Putar Suara</span>
+            </button>
+            <a href="https://id.wikipedia.org/wiki/Angklung" target="_blank" rel="noopener" class="btn-action btn-wiki">
+                <span class="action-icon">📖</span>
+                <span>Baca Selengkapnya</span>
+            </a>
+        </div>
+    </div>
 
-    <!-- SCRIPT -->
+    <!-- ============================================ -->
+    <!-- SCAN HINT (Muncul saat tidak ada marker) -->
+    <!-- ============================================ -->
+    <div id="scan-hint" class="scan-hint">
+        <div class="scan-animation">
+            <div class="scan-corners"></div>
+        </div>
+        <p>Arahkan kamera ke marker Angklung</p>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

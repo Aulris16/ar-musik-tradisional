@@ -1,215 +1,124 @@
 // ============================================
-// DEBUG LOGGER - Tampil di layar HP
+// ETNIK AR - Production Script
 // ============================================
-const debugLog = document.getElementById('debug-log');
-let logCount = 0;
 
-function log(msg, type = 'info') {
-    const colors = {
-        'info': '#88ff88',
-        'success': '#00ff00', 
-        'warn': '#ffff00',
-        'error': '#ff4444'
-    };
-    const icons = {
-        'info': 'ℹ️',
-        'success': '✅',
-        'warn': '⚠️', 
-        'error': '❌'
-    };
-    
-    // Console
-    console.log(`[${type.toUpperCase()}] ${msg}`);
-    
-    // Visual debug
-    if (debugLog) {
-        const entry = document.createElement('div');
-        entry.style.color = colors[type];
-        entry.style.padding = '3px 0';
-        entry.style.borderBottom = '1px solid #333';
-        entry.textContent = `${icons[type]} ${msg}`;
-        debugLog.appendChild(entry);
-        debugLog.scrollTop = debugLog.scrollHeight;
-        
-        // Limit entries
-        logCount++;
-        if (logCount > 20 && debugLog.firstChild) {
-            debugLog.removeChild(debugLog.firstChild);
-        }
-    }
-    
-    // Update status text
-    const statusText = document.getElementById('status-text');
-    if (statusText) {
-        statusText.textContent = msg;
-    }
-}
-
-// ============================================
-// WAIT FOR AFRAME & ARJS
-// ============================================
-function waitForAR(callback, maxAttempts = 20) {
-    let attempts = 0;
-    
-    const check = () => {
-        attempts++;
-        log(`Cek library... (${attempts})`, 'info');
-        
-        if (typeof AFRAME !== 'undefined') {
-            log('A-Frame OK!', 'success');
-            
-            // Check AR.js
-            if (AFRAME.components && AFRAME.components['arjs-look-controls']) {
-                log('AR.js OK!', 'success');
-                callback(true);
-                return;
-            }
-        }
-        
-        if (attempts >= maxAttempts) {
-            log('Timeout - coba refresh', 'error');
-            callback(false);
-            return;
-        }
-        
-        setTimeout(check, 500);
-    };
-    
-    check();
-}
-
-// ============================================
-// MAIN APP
-// ============================================
 document.addEventListener('DOMContentLoaded', () => {
-    log('App dimulai...', 'info');
-    
+    // ============================================
+    // ELEMENTS
+    // ============================================
     const onboarding = document.getElementById('onboarding-overlay');
     const btnStart = document.getElementById('btn-start');
-    const btnTestHiro = document.getElementById('btn-test-hiro');
-    const assetStatus = document.getElementById('asset-status');
+    const loadingStatus = document.getElementById('loading-status');
+    const statusText = document.getElementById('status-text');
     const scene = document.querySelector('a-scene');
+    
     const infoPanel = document.getElementById('info-panel');
+    const btnClose = document.getElementById('btn-close');
     const btnAudio = document.getElementById('btn-audio');
     const audioEl = document.getElementById('sound-angklung');
     
+    const scanHint = document.getElementById('scan-hint');
+    const markerAngklung = document.getElementById('marker-angklung');
+    
     let isAudioPlaying = false;
+    let arReady = false;
+
+    // ============================================
+    // WAIT FOR AR.JS TO LOAD
+    // ============================================
+    function checkARReady() {
+        let attempts = 0;
+        const maxAttempts = 30;
+        
+        const check = setInterval(() => {
+            attempts++;
+            
+            if (typeof AFRAME !== 'undefined' && AFRAME.components) {
+                clearInterval(check);
+                onARReady();
+            } else if (attempts >= maxAttempts) {
+                clearInterval(check);
+                // Enable anyway
+                onARReady();
+            }
+        }, 300);
+    }
     
-    // ============================================
-    // CHECK LIBRARIES
-    // ============================================
-    waitForAR((success) => {
-        if (success) {
-            assetStatus.textContent = '✅ AR.js siap!';
-            assetStatus.className = 'status-ready';
-            enableButtons();
-        } else {
-            assetStatus.textContent = '❌ Gagal load AR.js';
-            assetStatus.className = 'status-error';
-            // Enable anyway for retry
-            enableButtons();
-        }
-    });
+    function onARReady() {
+        arReady = true;
+        loadingStatus.innerHTML = '<span>✅ Siap digunakan!</span>';
+        loadingStatus.classList.add('ready');
+        
+        btnStart.disabled = false;
+        btnStart.innerHTML = '<span class="btn-icon">📷</span><span>Mulai Pengalaman AR</span>';
+    }
     
+    checkARReady();
+
     // ============================================
-    // SCENE & ASSET EVENTS
+    // SCENE EVENTS
     // ============================================
     if (scene) {
         scene.addEventListener('loaded', () => {
-            log('Scene ready!', 'success');
+            console.log('Scene loaded');
         });
         
         scene.addEventListener('arjs-video-loaded', () => {
-            log('Kamera aktif!', 'success');
+            console.log('Camera ready');
+            if (statusText) {
+                statusText.textContent = 'Arahkan kamera ke marker';
+            }
         });
     }
-    
-    // Assets
-    const assets = document.querySelector('a-assets');
-    if (assets) {
-        assets.addEventListener('loaded', () => {
-            log('Assets loaded!', 'success');
-        });
-    }
-    
-    // GLB Model
-    const glbAsset = document.getElementById('angklung-model');
-    if (glbAsset) {
-        glbAsset.addEventListener('loaded', () => {
-            log('Model 3D OK!', 'success');
-        });
-        glbAsset.addEventListener('error', () => {
-            log('Model 3D gagal!', 'error');
-        });
-    }
-    
+
     // ============================================
-    // MARKER EVENTS (Direct binding)
+    // MARKER EVENTS
     // ============================================
-    const markerHiro = document.getElementById('marker-hiro');
-    const markerAngklung = document.getElementById('marker-angklung');
-    
-    if (markerHiro) {
-        markerHiro.addEventListener('markerFound', () => {
-            log('🎯 HIRO FOUND!', 'success');
-        });
-        markerHiro.addEventListener('markerLost', () => {
-            log('HIRO hilang', 'warn');
-        });
-    }
-    
     if (markerAngklung) {
         markerAngklung.addEventListener('markerFound', () => {
-            log('🎯 ANGKLUNG FOUND!', 'success');
+            console.log('Marker found!');
+            
+            // Update UI
+            if (statusText) statusText.textContent = '🎯 Angklung Terdeteksi!';
+            if (scanHint) scanHint.classList.add('hidden');
             if (infoPanel) infoPanel.classList.remove('hidden');
         });
+        
         markerAngklung.addEventListener('markerLost', () => {
-            log('Angklung hilang', 'warn');
+            console.log('Marker lost');
+            
+            // Update UI
+            if (statusText) statusText.textContent = 'Arahkan kamera ke marker';
+            if (scanHint) scanHint.classList.remove('hidden');
             if (infoPanel) infoPanel.classList.add('hidden');
+            
+            // Stop audio
             stopAudio();
         });
     }
-    
+
     // ============================================
-    // BUTTON FUNCTIONS
+    // AUDIO CONTROLS
     // ============================================
-    function enableButtons() {
-        if (btnStart) {
-            btnStart.disabled = false;
-            btnStart.textContent = '🚀 MULAI AR';
-        }
-    }
-    
-    function hideOnboarding() {
-        if (onboarding) {
-            onboarding.classList.add('hide');
-        }
-    }
-    
     function stopAudio() {
         if (audioEl && isAudioPlaying) {
             audioEl.pause();
             audioEl.currentTime = 0;
             isAudioPlaying = false;
-            if (btnAudio) btnAudio.textContent = '🔊 Mainkan Suara';
+            updateAudioButton();
         }
     }
     
-    // ============================================
-    // BUTTON HANDLERS
-    // ============================================
-    if (btnStart) {
-        btnStart.addEventListener('click', () => {
-            log('Mulai AR...', 'info');
-            hideOnboarding();
-        });
-    }
-    
-    if (btnTestHiro) {
-        btnTestHiro.addEventListener('click', () => {
-            log('Mode test HIRO', 'info');
-            hideOnboarding();
-        });
+    function updateAudioButton() {
+        if (btnAudio) {
+            if (isAudioPlaying) {
+                btnAudio.innerHTML = '<span class="action-icon">⏸️</span><span>Hentikan</span>';
+                btnAudio.classList.add('playing');
+            } else {
+                btnAudio.innerHTML = '<span class="action-icon">🔊</span><span>Putar Suara</span>';
+                btnAudio.classList.remove('playing');
+            }
+        }
     }
     
     if (btnAudio && audioEl) {
@@ -218,11 +127,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 audioEl.play()
                     .then(() => {
                         isAudioPlaying = true;
-                        btnAudio.textContent = '⏸️ Stop Suara';
-                        log('Audio playing', 'info');
+                        updateAudioButton();
                     })
                     .catch(err => {
-                        log('Audio error!', 'error');
+                        console.error('Audio error:', err);
+                        alert('Tidak dapat memutar audio. Pastikan file audio tersedia.');
                     });
             } else {
                 stopAudio();
@@ -231,15 +140,38 @@ document.addEventListener('DOMContentLoaded', () => {
         
         audioEl.addEventListener('ended', () => {
             isAudioPlaying = false;
-            btnAudio.textContent = '🔊 Mainkan Suara';
+            updateAudioButton();
+        });
+    }
+
+    // ============================================
+    // BUTTON HANDLERS
+    // ============================================
+    
+    // Start Button
+    if (btnStart) {
+        btnStart.addEventListener('click', () => {
+            if (onboarding) {
+                onboarding.classList.add('hide');
+            }
         });
     }
     
+    // Close Info Panel
+    if (btnClose) {
+        btnClose.addEventListener('click', () => {
+            if (infoPanel) {
+                infoPanel.classList.add('hidden');
+            }
+        });
+    }
+
     // ============================================
-    // FALLBACK: Enable buttons after 6 seconds
+    // FALLBACK: Enable button after 8 seconds
     // ============================================
     setTimeout(() => {
-        enableButtons();
-        log('Fallback enable', 'info');
-    }, 6000);
+        if (!arReady) {
+            onARReady();
+        }
+    }, 8000);
 });

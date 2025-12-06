@@ -39,6 +39,31 @@ body {
 }
 
 /* ============================================
+   AR CONTAINER
+   ✅ FIXED: Pakai opacity bukan display:none
+   ============================================ */
+#ar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Hidden state: opacity 0, tapi MASIH RENDERED */
+#ar-container.ar-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Visible state */
+#ar-container.ar-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ============================================
    ONBOARDING SCREEN
    ============================================ */
 #onboarding-overlay {
@@ -46,19 +71,17 @@ body {
     inset: 0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     z-index: 10000;
-    display: flex !important;
+    display: flex;
     justify-content: center;
     align-items: center;
     padding: 24px;
-    opacity: 1 !important;
-    visibility: visible !important;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
 #onboarding-overlay.hide {
-    opacity: 0 !important;
-    visibility: hidden !important;
+    opacity: 0;
+    visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.5s ease, visibility 0.5s;
 }
 
 .onboarding-content {
@@ -180,11 +203,6 @@ body {
     display: none;
 }
 
-#loading-status .status-text {
-    flex: 1;
-    text-align: center;
-}
-
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
@@ -209,7 +227,6 @@ body {
     margin-bottom: 14px;
     transition: background 0.3s ease, transform 0.1s ease;
     min-height: 60px;
-    height: 60px;
 }
 
 #btn-start:not(:disabled) {
@@ -223,11 +240,6 @@ body {
 
 .btn-icon {
     font-size: 1.4rem;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 /* ============================================
@@ -279,7 +291,7 @@ body {
 }
 
 /* ============================================
-   HEADER
+   HEADER & AR UI
    ============================================ */
 header {
     position: fixed;
@@ -289,6 +301,19 @@ header {
     padding: 16px 20px;
     z-index: 1000;
     pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* Hidden state for AR UI elements */
+.ar-ui-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Visible state */
+.ar-ui-visible {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .header-content {
@@ -331,20 +356,6 @@ header {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 200px;
-}
-
-/* ============================================
-   AR CONTAINER
-   ============================================ */
-#ar-container {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-}
-
-#ar-container a-scene {
-    width: 100%;
-    height: 100%;
 }
 
 /* ============================================

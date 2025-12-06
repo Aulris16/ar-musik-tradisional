@@ -1,8 +1,10 @@
 // ============================================
-// ETNIK AR - Multi-Marker Support
+// ETNIK AR - Fixed: Controlled AR Start
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('App initialized');
+    
     // ============================================
     // ELEMENTS
     // ============================================
@@ -11,9 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingStatus = document.getElementById('loading-status');
     const statusTextEl = loadingStatus?.querySelector('.status-text');
     const headerStatus = document.getElementById('status-text');
-    const scene = document.querySelector('a-scene');
     
-    // Info Panel Elements
+    const arHeader = document.getElementById('ar-header');
+    const arContainer = document.getElementById('ar-container');
+    
     const infoPanel = document.getElementById('info-panel');
     const btnClose = document.getElementById('btn-close');
     const btnAudio = document.getElementById('btn-audio');
@@ -24,68 +27,40 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const scanHint = document.getElementById('scan-hint');
     
-    // All markers
-    const markers = document.querySelectorAll('a-marker');
-    
     let isAudioPlaying = false;
     let currentAudioEl = null;
     let currentMarkerData = null;
     let arReady = false;
+    let arStarted = false;
 
     // ============================================
-    // INSTRUMENT DATA (from marker attributes)
+    // ENSURE ONBOARDING IS VISIBLE
     // ============================================
-    function getMarkerData(marker) {
-        return {
-            id: marker.id,
-            name: marker.dataset.name || 'Unknown',
-            origin: marker.dataset.origin || 'Indonesia',
-            description: marker.dataset.description || 'Deskripsi tidak tersedia.',
-            audioId: marker.dataset.audio || null,
-            wikiUrl: marker.dataset.wiki || '#'
-        };
+    if (onboarding) {
+        onboarding.style.opacity = '1';
+        onboarding.style.visibility = 'visible';
+        onboarding.style.display = 'flex';
+        onboarding.classList.remove('hide');
     }
 
     // ============================================
-    // UPDATE INFO PANEL
-    // ============================================
-    function updateInfoPanel(data) {
-        if (infoName) infoName.textContent = data.name;
-        if (infoBadge) {
-            infoBadge.textContent = data.origin;
-            // Remove old classes and add new one
-            infoBadge.className = 'info-badge';
-            const badgeClass = data.id.replace('marker-', '');
-            infoBadge.classList.add(badgeClass);
-        }
-        if (infoDescription) infoDescription.textContent = data.description;
-        if (btnWiki) btnWiki.href = data.wikiUrl;
-        
-        // Set current audio element
-        if (data.audioId) {
-            currentAudioEl = document.getElementById(data.audioId);
-        } else {
-            currentAudioEl = null;
-        }
-        
-        currentMarkerData = data;
-    }
-
-    // ============================================
-    // WAIT FOR AR.JS TO LOAD
+    // CHECK AR LIBRARIES LOADED
     // ============================================
     function checkARReady() {
         let attempts = 0;
-        const maxAttempts = 30;
+        const maxAttempts = 40; // 12 seconds max
         
         const check = setInterval(() => {
             attempts++;
             
-            if (typeof AFRAME !== 'undefined' && AFRAME.components) {
+            // Check if A-Frame is loaded
+            if (typeof AFRAME !== 'undefined') {
                 clearInterval(check);
+                console.log('A-Frame loaded');
                 onARReady();
             } else if (attempts >= maxAttempts) {
                 clearInterval(check);
+                console.log('Timeout - enabling anyway');
                 onARReady();
             }
         }, 300);
@@ -108,58 +83,111 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnText.textContent = 'Mulai Pengalaman AR';
             }
         }
+        
+        console.log('AR Ready!');
     }
     
-    checkARReady();
+    // Start checking after a short delay
+    setTimeout(checkARReady, 500);
 
     // ============================================
-    // SCENE EVENTS
+    // START AR EXPERIENCE
     // ============================================
-    if (scene) {
-        scene.addEventListener('loaded', () => {
-            console.log('Scene loaded');
-        });
+    function startAR() {
+        if (arStarted) return;
+        arStarted = true;
         
-        scene.addEventListener('arjs-video-loaded', () => {
-            console.log('Camera ready');
-            if (headerStatus) {
-                headerStatus.textContent = 'Arahkan kamera ke marker';
-            }
-        });
+        console.log('Starting AR...');
+        
+        // Hide onboarding
+        if (onboarding) {
+            onboarding.classList.add('hide');
+        }
+        
+        // Show AR elements
+        if (arHeader) {
+            arHeader.style.display = 'block';
+        }
+        if (arContainer) {
+            arContainer.style.display = 'block';
+        }
+        if (scanHint) {
+            scanHint.classList.remove('hidden');
+        }
+        
+        // Initialize marker listeners after AR starts
+        setTimeout(initMarkerListeners, 500);
     }
 
     // ============================================
-    // MARKER EVENTS (All Markers)
+    // MARKER LISTENERS
     // ============================================
-    markers.forEach(marker => {
-        // Marker Found
-        marker.addEventListener('markerFound', () => {
-            const data = getMarkerData(marker);
-            console.log(`Marker found: ${data.name}`);
+    function initMarkerListeners() {
+        const markers = document.querySelectorAll('a-marker');
+        
+        markers.forEach(marker => {
+            marker.addEventListener('markerFound', () => {
+                const data = getMarkerData(marker);
+                console.log(`Marker found: ${data.name}`);
+                
+                if (headerStatus) headerStatus.textContent = `🎯 ${data.name} Terdeteksi!`;
+                if (scanHint) scanHint.classList.add('hidden');
+                
+                updateInfoPanel(data);
+                if (infoPanel) infoPanel.classList.remove('hidden');
+            });
             
-            // Update UI
-            if (headerStatus) headerStatus.textContent = `🎯 ${data.name} Terdeteksi!`;
-            if (scanHint) scanHint.classList.add('hidden');
-            
-            // Update and show info panel
-            updateInfoPanel(data);
-            if (infoPanel) infoPanel.classList.remove('hidden');
+            marker.addEventListener('markerLost', () => {
+                const data = getMarkerData(marker);
+                console.log(`Marker lost: ${data.name}`);
+                
+                if (headerStatus) headerStatus.textContent = 'Arahkan kamera ke marker';
+                if (scanHint) scanHint.classList.remove('hidden');
+                if (infoPanel) infoPanel.classList.add('hidden');
+                
+                stopAudio();
+            });
         });
         
-        // Marker Lost
-        marker.addEventListener('markerLost', () => {
-            const data = getMarkerData(marker);
-            console.log(`Marker lost: ${data.name}`);
-            
-            // Update UI
-            if (headerStatus) headerStatus.textContent = 'Arahkan kamera ke marker';
-            if (scanHint) scanHint.classList.remove('hidden');
-            if (infoPanel) infoPanel.classList.add('hidden');
-            
-            // Stop audio
-            stopAudio();
-        });
-    });
+        console.log(`Initialized ${markers.length} markers`);
+    }
+
+    // ============================================
+    // MARKER DATA HELPER
+    // ============================================
+    function getMarkerData(marker) {
+        return {
+            id: marker.id,
+            name: marker.dataset.name || 'Unknown',
+            origin: marker.dataset.origin || 'Indonesia',
+            description: marker.dataset.description || 'Deskripsi tidak tersedia.',
+            audioId: marker.dataset.audio || null,
+            wikiUrl: marker.dataset.wiki || '#'
+        };
+    }
+
+    // ============================================
+    // UPDATE INFO PANEL
+    // ============================================
+    function updateInfoPanel(data) {
+        if (infoName) infoName.textContent = data.name;
+        if (infoBadge) {
+            infoBadge.textContent = data.origin;
+            infoBadge.className = 'info-badge';
+            const badgeClass = data.id.replace('marker-', '');
+            infoBadge.classList.add(badgeClass);
+        }
+        if (infoDescription) infoDescription.textContent = data.description;
+        if (btnWiki) btnWiki.href = data.wikiUrl;
+        
+        if (data.audioId) {
+            currentAudioEl = document.getElementById(data.audioId);
+        } else {
+            currentAudioEl = null;
+        }
+        
+        currentMarkerData = data;
+    }
 
     // ============================================
     // AUDIO CONTROLS
@@ -171,6 +199,16 @@ document.addEventListener('DOMContentLoaded', () => {
             isAudioPlaying = false;
             updateAudioButton();
         }
+    }
+    
+    function stopAllAudio() {
+        const allAudio = document.querySelectorAll('audio');
+        allAudio.forEach(audio => {
+            audio.pause();
+            audio.currentTime = 0;
+        });
+        isAudioPlaying = false;
+        updateAudioButton();
     }
     
     function updateAudioButton() {
@@ -198,7 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (!isAudioPlaying) {
-                // Stop any previously playing audio first
                 stopAllAudio();
                 
                 currentAudioEl.play()
@@ -216,17 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Stop all audio elements
-    function stopAllAudio() {
-        const allAudio = document.querySelectorAll('audio');
-        allAudio.forEach(audio => {
-            audio.pause();
-            audio.currentTime = 0;
-        });
-        isAudioPlaying = false;
-    }
-    
-    // Listen for audio ended on all audio elements
+    // Audio ended listeners
     const allAudioElements = document.querySelectorAll('audio');
     allAudioElements.forEach(audio => {
         audio.addEventListener('ended', () => {
@@ -240,9 +267,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================
     if (btnStart) {
         btnStart.addEventListener('click', () => {
-            if (onboarding) {
-                onboarding.classList.add('hide');
-            }
+            console.log('Start button clicked');
+            startAR();
         });
     }
     
@@ -256,11 +282,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============================================
-    // FALLBACK
+    // FALLBACK: Enable button after 10 seconds
     // ============================================
     setTimeout(() => {
         if (!arReady) {
+            console.log('Fallback: enabling button');
             onARReady();
         }
-    }, 8000);
+    }, 10000);
 });

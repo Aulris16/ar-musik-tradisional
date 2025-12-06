@@ -1,5 +1,5 @@
 // ============================================
-// ETNIK AR - Production Script
+// ETNIK AR - Production Script (Fixed)
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const onboarding = document.getElementById('onboarding-overlay');
     const btnStart = document.getElementById('btn-start');
     const loadingStatus = document.getElementById('loading-status');
-    const statusText = document.getElementById('status-text');
+    const statusTextEl = loadingStatus?.querySelector('.status-text');
+    const headerStatus = document.getElementById('status-text');
     const scene = document.querySelector('a-scene');
     
     const infoPanel = document.getElementById('info-panel');
@@ -38,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 onARReady();
             } else if (attempts >= maxAttempts) {
                 clearInterval(check);
-                // Enable anyway
                 onARReady();
             }
         }, 300);
@@ -46,11 +46,23 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function onARReady() {
         arReady = true;
-        loadingStatus.innerHTML = '<span>✅ Siap digunakan!</span>';
-        loadingStatus.classList.add('ready');
         
-        btnStart.disabled = false;
-        btnStart.innerHTML = '<span class="btn-icon">📷</span><span>Mulai Pengalaman AR</span>';
+        // ✅ FIX: Update text content only, don't change structure
+        if (statusTextEl) {
+            statusTextEl.textContent = '✅ Siap digunakan!';
+        }
+        if (loadingStatus) {
+            loadingStatus.classList.add('ready');
+        }
+        
+        // Enable button
+        if (btnStart) {
+            btnStart.disabled = false;
+            const btnText = btnStart.querySelector('.btn-text');
+            if (btnText) {
+                btnText.textContent = 'Mulai Pengalaman AR';
+            }
+        }
     }
     
     checkARReady();
@@ -65,8 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         scene.addEventListener('arjs-video-loaded', () => {
             console.log('Camera ready');
-            if (statusText) {
-                statusText.textContent = 'Arahkan kamera ke marker';
+            if (headerStatus) {
+                headerStatus.textContent = 'Arahkan kamera ke marker';
             }
         });
     }
@@ -78,8 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         markerAngklung.addEventListener('markerFound', () => {
             console.log('Marker found!');
             
-            // Update UI
-            if (statusText) statusText.textContent = '🎯 Angklung Terdeteksi!';
+            if (headerStatus) headerStatus.textContent = '🎯 Angklung Terdeteksi!';
             if (scanHint) scanHint.classList.add('hidden');
             if (infoPanel) infoPanel.classList.remove('hidden');
         });
@@ -87,12 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
         markerAngklung.addEventListener('markerLost', () => {
             console.log('Marker lost');
             
-            // Update UI
-            if (statusText) statusText.textContent = 'Arahkan kamera ke marker';
+            if (headerStatus) headerStatus.textContent = 'Arahkan kamera ke marker';
             if (scanHint) scanHint.classList.remove('hidden');
             if (infoPanel) infoPanel.classList.add('hidden');
             
-            // Stop audio
             stopAudio();
         });
     }
@@ -110,14 +119,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function updateAudioButton() {
-        if (btnAudio) {
-            if (isAudioPlaying) {
-                btnAudio.innerHTML = '<span class="action-icon">⏸️</span><span>Hentikan</span>';
-                btnAudio.classList.add('playing');
-            } else {
-                btnAudio.innerHTML = '<span class="action-icon">🔊</span><span>Putar Suara</span>';
-                btnAudio.classList.remove('playing');
-            }
+        if (!btnAudio) return;
+        
+        const icon = btnAudio.querySelector('.action-icon');
+        const text = btnAudio.querySelector('span:last-child');
+        
+        if (isAudioPlaying) {
+            if (icon) icon.textContent = '⏸️';
+            if (text) text.textContent = 'Hentikan';
+            btnAudio.classList.add('playing');
+        } else {
+            if (icon) icon.textContent = '🔊';
+            if (text) text.textContent = 'Putar Suara';
+            btnAudio.classList.remove('playing');
         }
     }
     
@@ -131,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                     .catch(err => {
                         console.error('Audio error:', err);
-                        alert('Tidak dapat memutar audio. Pastikan file audio tersedia.');
+                        alert('Tidak dapat memutar audio.');
                     });
             } else {
                 stopAudio();
@@ -147,8 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================
     // BUTTON HANDLERS
     // ============================================
-    
-    // Start Button
     if (btnStart) {
         btnStart.addEventListener('click', () => {
             if (onboarding) {
@@ -157,7 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Close Info Panel
     if (btnClose) {
         btnClose.addEventListener('click', () => {
             if (infoPanel) {
@@ -167,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============================================
-    // FALLBACK: Enable button after 8 seconds
+    // FALLBACK
     // ============================================
     setTimeout(() => {
         if (!arReady) {

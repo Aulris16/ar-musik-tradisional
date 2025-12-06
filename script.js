@@ -1,9 +1,8 @@
 // ============================================
-// ETNIK AR - Fixed Camera Issue
+// ETNIK AR - Dynamic Scene Creation
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('App initialized');
     
     // ============================================
     // ELEMENTS
@@ -31,55 +30,34 @@ document.addEventListener('DOMContentLoaded', () => {
     let arStarted = false;
 
     // ============================================
-    // WAIT FOR AR.JS & CAMERA
+    // CHECK IF AFRAME LOADED
     // ============================================
-    function checkARReady() {
-        const scene = document.querySelector('a-scene');
+    function checkLibraries() {
+        let attempts = 0;
+        const maxAttempts = 30;
         
-        if (!scene) {
-            console.error('No a-scene found');
-            enableButton();
-            return;
-        }
-        
-        // Check if scene is already loaded
-        if (scene.hasLoaded) {
-            console.log('Scene already loaded');
-            onARReady();
-            return;
-        }
-        
-        // Wait for scene to load
-        scene.addEventListener('loaded', () => {
-            console.log('Scene loaded');
-            onARReady();
-        });
-        
-        // Also listen for camera ready
-        scene.addEventListener('arjs-video-loaded', () => {
-            console.log('Camera video loaded');
-        });
-        
-        // Fallback timeout
-        setTimeout(() => {
-            if (!arStarted) {
-                console.log('Fallback: enabling button');
-                onARReady();
+        const check = setInterval(() => {
+            attempts++;
+            
+            if (typeof AFRAME !== 'undefined') {
+                clearInterval(check);
+                console.log('A-Frame ready!');
+                onLibrariesReady();
+            } else if (attempts >= maxAttempts) {
+                clearInterval(check);
+                console.log('Timeout - enabling anyway');
+                onLibrariesReady();
             }
-        }, 8000);
+        }, 200);
     }
     
-    function onARReady() {
+    function onLibrariesReady() {
         if (statusTextEl) {
-            statusTextEl.textContent = '✅ Siap digunakan!';
+            statusTextEl.textContent = '✅ Siap! Klik tombol untuk mulai';
         }
         if (loadingStatus) {
             loadingStatus.classList.add('ready');
         }
-        enableButton();
-    }
-    
-    function enableButton() {
         if (btnStart) {
             btnStart.disabled = false;
             const btnText = btnStart.querySelector('.btn-text');
@@ -89,8 +67,101 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Start checking
-    checkARReady();
+    checkLibraries();
+
+    // ============================================
+    // CREATE AR SCENE (Dipanggil saat tombol diklik)
+    // ============================================
+    function createARScene() {
+        console.log('Creating AR Scene...');
+        
+        // Buat elemen a-scene
+        const sceneHTML = `
+            <a-scene 
+                embedded 
+                arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+                vr-mode-ui="enabled: false"
+                renderer="logarithmicDepthBuffer: true; antialias: true;"
+                loading-screen="enabled: false">
+
+                <a-assets timeout="30000">
+                    <a-asset-item id="angklung-model" src="assets/angklung.glb"></a-asset-item>
+                    <audio id="sound-angklung" src="assets/angklung.mp3" preload="auto"></audio>
+                    
+                    <a-asset-item id="gendang-bulo-model" src="assets/gendang-bulo.glb"></a-asset-item>
+                    <audio id="sound-gendang-bulo" src="assets/gendang-bulo.mp3" preload="auto"></audio>
+                </a-assets>
+
+                <a-marker 
+                    type="pattern" 
+                    url="markers/pattern-angklung.patt" 
+                    id="marker-angklung"
+                    data-name="Angklung"
+                    data-origin="Jawa Barat"
+                    data-description="Angklung adalah alat musik multitonal yang berkembang dari masyarakat Sunda. Terbuat dari bambu dan dimainkan dengan cara digoyangkan. UNESCO mengakui Angklung sebagai Warisan Budaya Dunia pada tahun 2010."
+                    data-audio="sound-angklung"
+                    data-wiki="https://id.wikipedia.org/wiki/Angklung">
+                    
+                    <a-light type="ambient" color="#ffffff" intensity="1"></a-light>
+                    <a-light type="directional" color="#ffffff" intensity="0.6" position="0 2 1"></a-light>
+                    
+                    <a-entity 
+                        gltf-model="#angklung-model"
+                        scale="0.5 0.5 0.5" 
+                        rotation="0 0 0" 
+                        position="0 0 0"
+                        animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear;">
+                    </a-entity>
+
+                    <a-text value="ANGKLUNG" position="0 1.2 0" align="center" color="#ffffff" scale="1.2 1.2 1.2"></a-text>
+                    <a-text value="Jawa Barat" position="0 0.95 0" align="center" color="#ffd700" scale="0.8 0.8 0.8"></a-text>
+                </a-marker>
+
+                <a-marker 
+                    type="pattern" 
+                    url="markers/pattern-gendang-bulo.patt" 
+                    id="marker-gendang-bulo"
+                    data-name="Gendang Bulo"
+                    data-origin="Sulawesi Selatan"
+                    data-description="Gendang Bulo adalah alat musik perkusi tradisional dari Sulawesi Selatan. Terbuat dari kayu dan kulit binatang, biasa digunakan dalam upacara adat dan pertunjukan tari tradisional Makassar."
+                    data-audio="sound-gendang-bulo"
+                    data-wiki="https://id.wikipedia.org/wiki/Gendang">
+                    
+                    <a-light type="ambient" color="#ffffff" intensity="1"></a-light>
+                    <a-light type="directional" color="#ffffff" intensity="0.6" position="0 2 1"></a-light>
+                    
+                    <a-entity 
+                        gltf-model="#gendang-bulo-model"
+                        scale="0.5 0.5 0.5" 
+                        rotation="0 0 0" 
+                        position="0 0 0"
+                        animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear;">
+                    </a-entity>
+
+                    <a-text value="GENDANG BULO" position="0 1.2 0" align="center" color="#ffffff" scale="1.2 1.2 1.2"></a-text>
+                    <a-text value="Sulawesi Selatan" position="0 0.95 0" align="center" color="#ffd700" scale="0.8 0.8 0.8"></a-text>
+                </a-marker>
+
+                <a-entity camera></a-entity>
+            </a-scene>
+        `;
+        
+        // Masukkan ke container
+        arContainer.innerHTML = sceneHTML;
+        
+        // Tunggu scene loaded, lalu init marker listeners
+        const scene = document.querySelector('a-scene');
+        if (scene) {
+            scene.addEventListener('loaded', () => {
+                console.log('Scene loaded!');
+                initMarkerListeners();
+            });
+            
+            scene.addEventListener('arjs-video-loaded', () => {
+                console.log('Camera active!');
+            });
+        }
+    }
 
     // ============================================
     // START AR
@@ -99,33 +170,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (arStarted) return;
         arStarted = true;
         
-        console.log('Starting AR experience...');
+        console.log('Starting AR...');
         
         // Hide onboarding
         if (onboarding) {
             onboarding.classList.add('hide');
         }
         
-        // Show AR container (change from hidden to visible)
-        if (arContainer) {
-            arContainer.classList.remove('ar-hidden');
-            arContainer.classList.add('ar-visible');
-        }
-        
-        // Show header
+        // Show UI elements
         if (arHeader) {
             arHeader.classList.remove('ar-ui-hidden');
             arHeader.classList.add('ar-ui-visible');
         }
-        
-        // Show scan hint
         if (scanHint) {
             scanHint.classList.remove('ar-ui-hidden');
             scanHint.classList.add('ar-ui-visible');
         }
         
-        // Initialize marker listeners
-        initMarkerListeners();
+        // CREATE SCENE (ini yang trigger kamera!)
+        createARScene();
     }
 
     // ============================================
@@ -133,6 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================
     function initMarkerListeners() {
         const markers = document.querySelectorAll('a-marker');
+        console.log(`Found ${markers.length} markers`);
         
         markers.forEach(marker => {
             marker.addEventListener('markerFound', () => {
@@ -157,8 +221,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 stopAudio();
             });
         });
-        
-        console.log(`Initialized ${markers.length} marker listeners`);
     }
 
     // ============================================
@@ -226,7 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (!isAudioPlaying) {
-                // Stop all audio first
                 document.querySelectorAll('audio').forEach(a => {
                     a.pause();
                     a.currentTime = 0;
@@ -246,14 +307,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    
-    // Audio ended event
-    document.querySelectorAll('audio').forEach(audio => {
-        audio.addEventListener('ended', () => {
-            isAudioPlaying = false;
-            updateAudioButton();
-        });
-    });
 
     // ============================================
     // BUTTON HANDLERS

@@ -28,7 +28,7 @@
             <div class="instructions">
                 <div class="instruction-item">
                     <span class="step">1</span>
-                    <span>Siapkan marker Angklung</span>
+                    <span>Pilih & siapkan marker</span>
                 </div>
                 <div class="instruction-item">
                     <span class="step">2</span>
@@ -40,7 +40,6 @@
                 </div>
             </div>
 
-            <!-- ✅ FIXED: Proper structure -->
             <div id="loading-status">
                 <div class="loader"></div>
                 <span class="status-text">Memuat pengalaman AR...</span>
@@ -51,10 +50,20 @@
                 <span class="btn-text">Mulai Pengalaman AR</span>
             </button>
             
-            <a href="assets/marker-angklung.png" target="_blank" class="download-marker" download>
-                <span class="btn-icon">📥</span>
-                <span>Download Marker Angklung</span>
-            </a>
+            <!-- Download Markers -->
+            <div class="marker-downloads">
+                <p class="marker-title">📥 Download Marker:</p>
+                <div class="marker-buttons">
+                    <a href="assets/marker-angklung.png" target="_blank" class="download-marker-btn" download>
+                        <span>🎋</span>
+                        <span>Angklung</span>
+                    </a>
+                    <a href="assets/marker-gendang-bulo.png" target="_blank" class="download-marker-btn" download>
+                        <span>🥁</span>
+                        <span>Gendang Bulo</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -83,19 +92,38 @@
         renderer="logarithmicDepthBuffer: true; antialias: true;"
         loading-screen="enabled: false">
 
+        <!-- ============================================ -->
         <!-- ASSETS -->
+        <!-- ============================================ -->
         <a-assets timeout="30000">
+            <!-- Angklung Assets -->
             <a-asset-item id="angklung-model" src="assets/angklung.glb"></a-asset-item>
             <audio id="sound-angklung" src="assets/angklung.mp3" preload="auto"></audio>
+            
+            <!-- Gendang Bulo Assets -->
+            <a-asset-item id="gendang-bulo-model" src="assets/gendang-bulo.glb"></a-asset-item>
+            <audio id="sound-gendang-bulo" src="assets/gendang-bulo.mp3" preload="auto"></audio>
         </a-assets>
 
-        <!-- MARKER ANGKLUNG -->
-        <a-marker type="pattern" url="markers/pattern-angklung.patt" id="marker-angklung">
+        <!-- ============================================ -->
+        <!-- MARKER 1: ANGKLUNG -->
+        <!-- ============================================ -->
+        <a-marker 
+            type="pattern" 
+            url="markers/pattern-angklung.patt" 
+            id="marker-angklung"
+            data-name="Angklung"
+            data-origin="Jawa Barat"
+            data-description="Angklung adalah alat musik multitonal yang berkembang dari masyarakat Sunda. Terbuat dari bambu dan dimainkan dengan cara digoyangkan. UNESCO mengakui Angklung sebagai Warisan Budaya Dunia pada tahun 2010."
+            data-audio="sound-angklung"
+            data-wiki="https://id.wikipedia.org/wiki/Angklung">
+            
+            <!-- Lighting -->
             <a-light type="ambient" color="#ffffff" intensity="1"></a-light>
             <a-light type="directional" color="#ffffff" intensity="0.6" position="0 2 1"></a-light>
             
+            <!-- 3D Model -->
             <a-entity 
-                id="model-angklung"
                 gltf-model="#angklung-model"
                 scale="0.5 0.5 0.5" 
                 rotation="0 0 0" 
@@ -103,6 +131,7 @@
                 animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear;">
             </a-entity>
 
+            <!-- Labels -->
             <a-text value="ANGKLUNG" 
                     position="0 1.2 0" 
                     align="center" 
@@ -117,23 +146,65 @@
             </a-text>
         </a-marker>
 
+        <!-- ============================================ -->
+        <!-- MARKER 2: GENDANG BULO -->
+        <!-- ============================================ -->
+        <a-marker 
+            type="pattern" 
+            url="markers/pattern-gendang-bulo.patt" 
+            id="marker-gendang-bulo"
+            data-name="Gendang Bulo"
+            data-origin="Sulawesi Selatan"
+            data-description="Gendang Bulo adalah alat musik perkusi tradisional dari Sulawesi Selatan. Terbuat dari kayu dan kulit binatang, biasa digunakan dalam upacara adat dan pertunjukan tari tradisional Makassar."
+            data-audio="sound-gendang-bulo"
+            data-wiki="https://id.wikipedia.org/wiki/Gendang">
+            
+            <!-- Lighting -->
+            <a-light type="ambient" color="#ffffff" intensity="1"></a-light>
+            <a-light type="directional" color="#ffffff" intensity="0.6" position="0 2 1"></a-light>
+            
+            <!-- 3D Model -->
+            <a-entity 
+                gltf-model="#gendang-bulo-model"
+                scale="0.5 0.5 0.5" 
+                rotation="0 0 0" 
+                position="0 0 0"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear;">
+            </a-entity>
+
+            <!-- Labels -->
+            <a-text value="GENDANG BULO" 
+                    position="0 1.2 0" 
+                    align="center" 
+                    color="#ffffff" 
+                    scale="1.2 1.2 1.2">
+            </a-text>
+            <a-text value="Sulawesi Selatan" 
+                    position="0 0.95 0" 
+                    align="center" 
+                    color="#ffd700" 
+                    scale="0.8 0.8 0.8">
+            </a-text>
+        </a-marker>
+
+        <!-- CAMERA -->
         <a-entity camera></a-entity>
     </a-scene>
 
     <!-- ============================================ -->
-    <!-- INFO PANEL -->
+    <!-- INFO PANEL (Dynamic) -->
     <!-- ============================================ -->
     <div id="info-panel" class="info-panel hidden">
         <div class="info-header">
             <div class="info-title">
-                <h2>Angklung</h2>
-                <span class="info-badge">Jawa Barat</span>
+                <h2 id="info-name">Nama Alat</h2>
+                <span id="info-badge" class="info-badge">Asal</span>
             </div>
             <button id="btn-close" class="btn-close" aria-label="Tutup">×</button>
         </div>
         
         <div class="info-body">
-            <p>Angklung adalah alat musik multitonal yang berkembang dari masyarakat Sunda. Terbuat dari bambu dan dimainkan dengan cara digoyangkan. UNESCO mengakui Angklung sebagai Warisan Budaya Dunia pada tahun 2010.</p>
+            <p id="info-description">Deskripsi alat musik...</p>
         </div>
         
         <div class="info-actions">
@@ -141,7 +212,7 @@
                 <span class="action-icon">🔊</span>
                 <span>Putar Suara</span>
             </button>
-            <a href="https://id.wikipedia.org/wiki/Angklung" target="_blank" rel="noopener" class="btn-action btn-wiki">
+            <a id="btn-wiki" href="#" target="_blank" rel="noopener" class="btn-action btn-wiki">
                 <span class="action-icon">📖</span>
                 <span>Selengkapnya</span>
             </a>
@@ -155,7 +226,7 @@
         <div class="scan-animation">
             <div class="scan-corners"></div>
         </div>
-        <p>Arahkan kamera ke marker Angklung</p>
+        <p>Arahkan kamera ke salah satu marker</p>
     </div>
 
     <script src="script.js"></script>
